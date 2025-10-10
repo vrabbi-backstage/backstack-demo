@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  annotations:
+    policies.kyverno.io/category: Data
+    policies.kyverno.io/severity: medium
+  name: deny-nginx-image
+spec:
+  admission: true
+  background: true
+  emitWarning: false
+  rules:
+  - match:
+      any:
+      - resources:
+          kinds:
+          - App
+          - ClusterApp
+          - WebApp
+    name: test-image
+    skipBackgroundRequests: true
+    validate:
+      pattern:
+        spec:
+          image: "!nginx"
+      message: nginx image not allowed
+  validationFailureAction: Audit

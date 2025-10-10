@@ -1,0 +1,26 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  annotations:
+    policies.kyverno.io/category: Resources
+    policies.kyverno.io/severity: high
+  name: require-autoscaling
+spec:
+  admission: true
+  background: true
+  emitWarning: false
+  rules:
+  - match:
+      any:
+      - resources:
+          kinds:
+          - WebApp
+    name: validate-autoscaling-enabled
+    skipBackgroundRequests: true
+    validate:
+      pattern:
+        spec:
+          scaling:
+            enabled: true
+      message: autoscaling enablement is required in this environment for webapps
+  validationFailureAction: Audit

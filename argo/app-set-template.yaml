@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: demo-cluster-files
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}.git
+        revision: main
+        files:
+          - path: demo-cluster/*/*/*.yaml
+
+  template:
+    metadata:
+      # name = <ns>-<kind>-<name> derived from demo-cluster/<ns>/<kind>/<name>.yaml
+      # Using path segments: [0]=demo-cluster, [1]=namespace, [2]=kind
+      name: '{{ printf "%s-%s-%s" (index .path.segments 1) (index .path.segments 2) .path.basenameNormalized | lower }}'
+
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}.git
+        targetRevision: main
+        # Point to the directory containing the file
+        path: '{{ index .path.segments 0 }}/{{ index .path.segments 1 }}/{{ index .path.segments 2 }}'
+        directory:
+          recurse: false
+          include: '{{ .path.filename }}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{ index .path.segments 1 | lower }}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

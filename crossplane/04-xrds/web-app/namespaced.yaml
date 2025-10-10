@@ -1,0 +1,58 @@
+apiVersion: apiextensions.crossplane.io/v2
+kind: CompositeResourceDefinition
+metadata:
+  name: webapps.example.crossplane.io
+spec:
+  scope: Namespaced
+  group: example.crossplane.io
+  names:
+    kind: WebApp
+    plural: webapps
+  versions:
+  - name: v1
+    served: true
+    referenceable: true
+    schema:
+     openAPIV3Schema:
+       type: object
+       properties:
+        spec:
+          type: object
+          properties:
+            scaling:
+              description: The webapp's scaling configuration.
+              type: object
+              properties:
+                enabled:
+                  description: Whether the webapp is scaled.
+                  type: boolean
+                  default: true
+                minReplicas:
+                  description: The minimum number of available app replicas.
+                  type: integer
+                  default: 1
+                maxReplicas:
+                  description: The maximum number of available app replicas.
+                  type: integer
+                  default: 10
+            fqdn:
+              description: The webapp's FQDN.
+              type: string
+            port:
+              description: The webapp's port
+              type: integer
+              default: 80
+            image:
+              description: The app's OCI container image.
+              type: string
+          required:
+          - image
+          - fqdn
+          - port
+        status:
+          type: object
+          properties:
+            replicas:
+              description: The number of available app replicas.
+              type: integer
+

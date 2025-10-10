@@ -1,0 +1,26 @@
+apiVersion: example.clustered.crossplane.io/v1
+kind: ClusterApp
+metadata:
+  name: my-clustered-app
+  annotations:
+    terasky.backstage.io/links: |
+      [
+        {
+          "url": "https://docs.upbound.io/",
+          "title": "Upbound Docs",
+          "icon": "dashboard"
+        },
+        {
+          "url": "https://docs.crossplane.io/",
+          "title": "Crossplane Docs",
+          "icon": "docs"
+        },
+        {
+          "url": "https://grafana.example.com/d/xyz",
+          "title": "Grafana Dashboard",
+          "icon": "grafana"
+        }
+      ]
+spec:
+  image: nginx
+  namespace: default

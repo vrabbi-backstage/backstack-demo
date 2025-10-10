@@ -1,0 +1,26 @@
+apiVersion: example.crossplane.io/v1
+kind: App
+metadata:
+  namespace: default
+  name: my-app
+  annotations:
+    terasky.backstage.io/links: |
+      [
+        {
+          "url": "https://docs.upbound.io/",
+          "title": "Upbound Docs",
+          "icon": "dashboard"
+        },
+        {
+          "url": "https://docs.crossplane.io/",
+          "title": "Crossplane Docs",
+          "icon": "docs"
+        },
+        {
+          "url": "https://grafana.example.com/d/xyz",
+          "title": "Grafana Dashboard",
+          "icon": "grafana"
+        }
+      ]
+spec:
+  image: nginx

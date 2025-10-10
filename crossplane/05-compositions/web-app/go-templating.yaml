@@ -1,0 +1,121 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: web-app-go-templating
+spec:
+  compositeTypeRef:
+    apiVersion: example.crossplane.io/v1
+    kind: WebApp
+  mode: Pipeline
+  pipeline:
+  - step: create-deployment-and-service
+    functionRef:
+      name: crossplane-contrib-function-go-templating
+    input:
+      apiVersion: gotemplating.fn.crossplane.io/v1beta1
+      kind: GoTemplate
+      source: Inline
+      inline:
+        template: |
+          ---
+          {{ if .observed.composite.resource.spec.scaling.enabled }}
+          apiVersion: autoscaling/v2
+          kind: HorizontalPodAutoscaler
+          metadata:
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: hpa
+              gotemplating.fn.crossplane.io/ready: "True"
+            labels:
+              example.crossplane.io/app: {{ .observed.composite.resource.metadata.name }}
+            name: {{ .observed.composite.resource.metadata.name }}
+          spec:
+            scaleTargetRef:
+              apiVersion: apps/v1
+              kind: Deployment
+              name: {{ .observed.composite.resource.metadata.name }}  
+            minReplicas: {{ .observed.composite.resource.spec.scaling.minReplicas }}
+            maxReplicas: {{ .observed.composite.resource.spec.scaling.maxReplicas }}
+            metrics:
+            - type: Resource
+              resource:
+                name: cpu
+                target:
+                  type: Utilization
+                  averageUtilization: 50
+          {{ end }}
+          ---
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: {{ .observed.composite.resource.metadata.name }}
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: deployment
+              {{ if eq (.observed.resources.deployment | getResourceCondition "Available").Status "True" }}
+              gotemplating.fn.crossplane.io/ready: "True"
+              {{ end }}
+            labels:
+              example.crossplane.io/app: {{ .observed.composite.resource.metadata.name }}
+          spec:
+            {{ if not .observed.composite.resource.spec.scaling.enabled }}
+            replicas: 1
+            {{ end }}
+            selector:
+              matchLabels:
+                example.crossplane.io/app: {{ .observed.composite.resource.metadata.name }}
+            template:
+              metadata:
+                labels:
+                  example.crossplane.io/app: {{ .observed.composite.resource.metadata.name }}
+              spec:
+                containers:
+                - name: app
+                  image: {{ .observed.composite.resource.spec.image }}
+                  ports:
+                  - containerPort: 80
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: {{ .observed.composite.resource.metadata.name }}
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: service
+              {{ if (get (getComposedResource . "service").spec "clusterIP") }}
+              gotemplating.fn.crossplane.io/ready: "True"
+              {{ end }}
+            labels:
+              example.crossplane.io/app: {{ .observed.composite.resource.metadata.name }}
+          spec:
+            selector:
+              example.crossplane.io/app: {{ .observed.composite.resource.metadata.name }}
+            ports:
+            - protocol: TCP
+              port: {{ .observed.composite.resource.spec.port }}
+              targetPort: {{ .observed.composite.resource.spec.port }}
+          ---
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: {{ .observed.composite.resource.metadata.name }}
+            annotations:
+              gotemplating.fn.crossplane.io/composition-resource-name: ingress
+              gotemplating.fn.crossplane.io/ready: "True"
+            labels:
+              example.crossplane.io/app: {{ .observed.composite.resource.metadata.name }}
+          spec:
+            rules:
+            - host: {{ .observed.composite.resource.spec.fqdn }}
+              http:
+                paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: {{ .observed.composite.resource.metadata.name }}
+                      port:
+                        number: {{ .observed.composite.resource.spec.port }}
+          ---
+          apiVersion: example.crossplane.io/v1
+          kind: WebApp
+          status:
+            replicas: {{ get (getComposedResource . "deployment").status "availableReplicas" | default 0 }}
+

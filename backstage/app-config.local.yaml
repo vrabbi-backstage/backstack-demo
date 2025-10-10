@@ -1,0 +1,142 @@
+app:
+  title: Backstack Kubecon 2025 NA Demo
+  baseUrl: http://localhost:3000
+
+  # Enable all packages by default, this will discover packages from packages/app/package.json
+  packages: all
+
+  extensions:
+    # Disable the nav items that we're manually rendering in packages/app/src/modules/nav/Sidebar.tsx
+    - nav-item:search: false
+    - nav-item:user-settings: false
+    - nav-item:catalog: false
+    - nav-item:scaffolder: false
+    - entity-card:catalog/has-subcomponents: false
+    - entity-card:catalog/depends-on-components: false
+    - entity-card:catalog/depends-on-resources: false
+
+    # Configure the catalog index page to be the root page, this is normally mounted on /catalog
+    - page:catalog:
+        config:
+          path: /
+
+
+organization:
+  name: Backstack
+
+backend:
+  baseUrl: http://localhost:7007
+  listen:
+    port: 7007
+  csp:
+    connect-src: ["'self'", 'http:', 'https:']
+  cors:
+    origin: http://localhost:3000
+    methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+    credentials: true
+  database:
+    client: better-sqlite3
+    connection: ':memory:'
+  reading:
+    allow:
+      - host: raw.githubusercontent.com
+
+integrations:
+  github:
+    - host: github.com
+      token: ${GITHUB_TOKEN}
+
+techdocs:
+  builder: 'local' # Alternatives - 'external'
+  generator:
+    runIn: 'docker' # Alternatives - 'local'
+  publisher:
+    type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
+
+auth:
+  providers:
+    guest: {}
+    github:
+      development:
+        clientId: ${GITHUB_CLIENT_ID}
+        clientSecret: ${GITHUB_CLIENT_SECRET}
+        signIn:
+          resolvers:
+            - resolver: emailLocalPartMatchingUserEntityName
+            - resolver: usernameMatchingUserEntityName
+            - resolver: emailMatchingUserEntityProfileEmail
+
+catalog:
+  import:
+    entityFilename: catalog-info.yaml
+    pullRequestBranchName: backstage-integration
+  rules:
+    - allow: [Component, System, API, Resource, Location]
+  locations:
+    - type: file
+      target: ../../examples/entities.yaml
+    - type: file
+      target: ../../examples/template/template.yaml
+      rules:
+        - allow: [Template]
+    - type: file
+      target: ../../examples/org.yaml
+      rules:
+        - allow: [User, Group]
+
+permission:
+  enabled: false
+
+kubernetesIngestor:
+  mappings:
+    namespaceModel: 'default'
+    nameModel: 'name-cluster'
+    titleModel: 'name'
+    systemModel: 'namespace'
+    referencesNamespaceModel: 'default'
+  components:
+    enabled: true
+    taskRunner:
+      frequency: 10
+      timeout: 600
+    excludedNamespaces:
+      - kube-public
+      - kube-system
+    customWorkloadTypes: []
+    disableDefaultWorkloadTypes: false
+    onlyIngestAnnotatedResources: false
+  crossplane:
+    claims:
+      ingestAllClaims: true
+    xrds:
+      convertDefaultValuesToPlaceholders: true
+      enabled: true
+      publishPhase:
+        allowRepoSelection: false
+        allowedTargets: ['github.com']
+        target: github
+        git:
+          repoUrl: github.com?owner=${GITHUB_OWNER}&repo=${GITHUB_REPO}
+          targetBranch: main
+      taskRunner:
+        frequency: 10
+        timeout: 600
+      ingestAllXRDs: true
+crossplane:
+  enablePermissions: false
+kyverno:
+  enablePermissions: false
+kubernetes:
+  frontend:
+    podDelete:
+      enabled: true
+  serviceLocatorMethod:
+    type: 'singleTenant'
+  clusterLocatorMethods:
+    - type: 'config'
+      clusters:
+        - name: demo-cluster
+          authProvider: 'serviceAccount'
+          skipTLSVerify: true
+          url: ${KUBERNETES_URL}
+          serviceAccountToken: ${KUBERNETES_SERVICE_ACCOUNT_TOKEN}

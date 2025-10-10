@@ -1,0 +1,13 @@
+apiVersion: example.crossplane.io/v1
+kind: WebApp
+metadata:
+  namespace: default
+  name: my-web-app
+spec:
+  image: nginx
+  scaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+  fqdn: webapp.example.com
+  port: 80
