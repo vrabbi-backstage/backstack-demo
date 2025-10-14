@@ -115,6 +115,7 @@ export KUBERNETES_SERVICE_ACCOUNT_TOKEN=`kubectl get secret -n backstage-system 
 ## Start Backstage
 ```bash
 cd backstage
+yarn install
 export NODE_OPTIONS="--max_old_space_size=8192 --no-node-snapshot"
 export NODE_TLS_REJECT_UNAUTHORIZED=0
 yarn start
