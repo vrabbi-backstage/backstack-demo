@@ -17,11 +17,11 @@ backstage/node_modules/
 # Yarn files
 backstage/.pnp.*
 backstage/.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
+!backstage/.yarn/patches
+!backstage/.yarn/plugins
+!backstage/.yarn/releases
+!backstage/.yarn/sdks
+!backstage/.yarn/versions
 
 # Node version directives
 backstage/.nvmrc
