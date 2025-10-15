@@ -90,7 +90,7 @@ permission:
 kubernetesIngestor:
   mappings:
     namespaceModel: 'default'
-    nameModel: 'name-cluster'
+    nameModel: 'name-kind'
     titleModel: 'name'
     systemModel: 'namespace'
     referencesNamespaceModel: 'default'
@@ -103,7 +103,7 @@ kubernetesIngestor:
       - kube-public
       - kube-system
     customWorkloadTypes: []
-    disableDefaultWorkloadTypes: false
+    disableDefaultWorkloadTypes: true
     onlyIngestAnnotatedResources: false
   crossplane:
     claims:

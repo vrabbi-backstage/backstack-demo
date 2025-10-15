@@ -28,7 +28,7 @@ export const SidebarContent = NavContentBlueprint.make({
           <SidebarDivider />
           <SidebarGroup label="Menu" icon={<MenuIcon />}>
             {/* Global nav, not org-specific */}
-            <SidebarItem icon={HomeIcon} to="catalog" text="Home" />
+            <SidebarItem icon={HomeIcon} to="/?filters%5Bkind%5D=component&filters%5Buser%5D=all&limit=20" text="Home" />
             <SidebarItem
               icon={CreateComponentIcon}
               to="create"
