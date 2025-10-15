@@ -64,8 +64,7 @@ kubectl apply -f crossplane/06-examples --recursive
 
 ## Configure Kyverno Policies
 ```bash
-kubectl apply -f kyverno/policy-rbac.yaml
-kubectl apply -f kyverno/policy.yaml
+kubectl apply -f kyverno/
 ```
 
 ## Configure Argo AppSet
