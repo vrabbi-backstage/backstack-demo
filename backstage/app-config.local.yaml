@@ -1,3 +1,4 @@
+enableExperimentalRedirectFlow: true
 app:
   title: Backstack Kubecon 2025 NA Demo
   baseUrl: http://localhost:3000
