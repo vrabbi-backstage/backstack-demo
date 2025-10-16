@@ -6,7 +6,8 @@ This repository is configured for GitHub Codespaces! You can develop in a fully 
 
 When using Codespaces, all prerequisites are automatically installed. See [.devcontainer/README.md](.devcontainer/README.md) for details.
 
-# Pre Requisites
+# Manual Setup Instructions
+## Pre Requisites
 1. [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
 2. [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installing-from-release-binaries)
 3. [helm](https://helm.sh/docs/intro/install/#from-script)
@@ -14,7 +15,7 @@ When using Codespaces, all prerequisites are automatically installed. See [.devc
 5. [node 20](https://nodejs.org/en/download)
 6. [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
-# Manual Preperation Steps:
+## Manual Preperation Steps:
 1. [Create Github PAT](https://github.com/settings/tokens/new)
 2. [Create Github Oauth App](https://github.com/settings/applications/new)
     * Application Name: Backstage
@@ -24,9 +25,9 @@ When using Codespaces, all prerequisites are automatically installed. See [.devc
 4. Create a Client Secret and copy it
 5. Update first User Manifests Username from vrabbi to your Github Username in [the relevant file](./backstage/examples/org.yaml)  
 
-# Deploy the BackStack
+## Configure and Deploy the BackStack
 
-## Export Github Variables
+### Export Github Variables
 ```bash
 export GITHUB_TOKEN=""
 export GITHUB_CLIENT_ID=""
@@ -35,30 +36,30 @@ export GITHUB_OWNER=""
 export GITHUB_REPO=""
 ```
 
-## Create Kind Cluster
+### Create Kind Cluster
 ```bash
 kind create cluster --name backstack-demo 
 ```
-## Install Kyverno
+### Install Kyverno
 ```bash
 helm repo add kyverno https://kyverno.github.io/kyverno/
 helm repo update
 helm install kyverno kyverno/kyverno -n kyverno --create-namespace
 ```
-## Install Crossplane
+### Install Crossplane
 ```bash
 helm repo add crossplane-stable https://charts.crossplane.io/stable
 helm repo update
 helm install crossplane --namespace crossplane-system --create-namespace crossplane-stable/crossplane
 ```
 
-## Install ArgoCD
+### Install ArgoCD
 ```bash
 kubectl create ns argocd
 kubectl apply -f https://raw.githubusercontent.com/argoproj/argo-cd/refs/heads/master/manifests/install.yaml -n argocd
 ```
 
-## Configure Crossplane
+### Configure Crossplane
 ```bash
 kubectl create clusterrolebinding --serviceaccount crossplane-system:crossplane --clusterrole cluster-admin allow-all-resources-crossplane
 kubectl apply -f crossplane/01-functions
@@ -70,18 +71,18 @@ kubectl apply -f crossplane/05-compositions --recursive
 kubectl apply -f crossplane/06-examples --recursive
 ```
 
-## Configure Kyverno Policies
+### Configure Kyverno Policies
 ```bash
 kubectl apply -f kyverno/
 ```
 
-## Configure Argo AppSet
+### Configure Argo AppSet
 ```bash
 envsubst <argo/app-set-template.yaml > argo/app-set-rendered.yaml
 kubectl apply -f argo/app-set-rendered.yaml
 ```
 
-## Create RBAC for Backstage to communicate with K8s Cluster
+### Create RBAC for Backstage to communicate with K8s Cluster
 ```bash
 kubectl create namespace backstage-system
 kubectl create serviceaccount -n backstage-system backstage-user
@@ -111,15 +112,15 @@ subjects:
 EOF
 ```
 
-## Export Kubernetes Cluster Details
+### Export Kubernetes Cluster Details
 ```bash
 export KUBERNETES_URL=`kubectl config view --raw --minify -o jsonpath='{.clusters[0].cluster.server}'`
 export KUBERNETES_SERVICE_ACCOUNT_TOKEN=`kubectl get secret -n backstage-system backstage-token -o jsonpath='{.data.token}' | base64 --decode`
 ```
 
-# Start the Backstack
+## Start the Backstack
 
-## Start Backstage
+### Start Backstage
 ```bash
 cd backstage
 yarn install
@@ -128,7 +129,7 @@ export NODE_TLS_REJECT_UNAUTHORIZED=0
 yarn start
 ```
 
-# Explore the app
+## Explore the app
 1. Login with your github account
 2. filter for components of type crossplane-xr
 3. check out the example workloads which have been autoingested, see the visualization and checkout the kyverno policy report data
