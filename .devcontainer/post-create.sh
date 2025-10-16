@@ -1,17 +1,74 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Setting up Backstack Demo environment..."
+echo "Setting up Backstack Demo environment..."
 # Navigate to backstage directory and install dependencies
-echo "📦 Installing Backstage dependencies..."
+echo "Installing Backstage dependencies..."
 cd backstage
 yarn install
+cd ..
+echo "Create Kind Cluster..."
+kind create cluster --name backstack-demo 
 
-echo "✅ Setup complete!"
+echo "Install Kyverno..."
+helm repo add kyverno https://kyverno.github.io/kyverno/
+helm repo update
+helm install kyverno kyverno/kyverno -n kyverno --create-namespace --wait
+
+echo "Install Crossplane..."
+helm repo add crossplane-stable https://charts.crossplane.io/stable
+helm repo update
+helm install crossplane --namespace crossplane-system --create-namespace crossplane-stable/crossplane --wait
+
+echo "Install ArgoCD..."
+kubectl create ns argocd
+kubectl apply -f https://raw.githubusercontent.com/argoproj/argo-cd/refs/heads/master/manifests/install.yaml -n argocd
+
+echo "Create Backstage RBAC..."
+kubectl create namespace backstage-system
+kubectl create serviceaccount -n backstage-system backstage-user
+kubectl create -f- <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backstage-token
+  namespace: backstage-system
+  annotations:
+    kubernetes.io/service-account.name: backstage-user
+type: kubernetes.io/service-account-token
+EOF
+kubectl create -f- <<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: backstage-kubernetes-rbac
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: backstage-user
+  namespace: backstage-system
+EOF
+
+echo "Configure Crossplane..."
+kubectl create clusterrolebinding --serviceaccount crossplane-system:crossplane --clusterrole cluster-admin allow-all-resources-crossplane
+kubectl apply -f crossplane/01-functions
+kubectl apply -f crossplane/02-providers
+kubectl wait --for condition=Healthy=true providers.p crossplane-contrib-provider-kubernetes
+kubectl apply -f crossplane/03-provider-configs
+kubectl apply -f crossplane/04-xrds --recursive
+kubectl apply -f crossplane/05-compositions --recursive
+kubectl apply -f crossplane/06-examples --recursive
+
+echo "Configure Kyverno..."
+kubectl apply -f kyverno/
+
+echo "Setup complete!"
 echo ""
-echo "📝 Next steps:"
-echo "   1. Set up your environment variables (GITHUB_TOKEN, GITHUB_CLIENT_ID, etc.)"
-echo "   2. Create a Kind cluster: kind create cluster --name backstack-demo"
-echo "   3. Follow the instructions in README.md to deploy the stack"
-echo "   4. Start Backstage: cd backstage && yarn start"
+echo "Next steps:"
+echo "  1. Set up your environment variables (GITHUB_TOKEN, GITHUB_CLIENT_ID, etc.)"
+echo "  2. Render and Apply ArgoCD AppSet"
+echo "  3. Start Backstage: cd backstage && yarn start"
 echo ""
