@@ -12,6 +12,9 @@ The devcontainer is configured with:
 - **kind**: Kubernetes in Docker (for local cluster creation)
 - **Docker-in-Docker**: Required for kind and container operations
 - **Yarn 4**: Package manager (enabled via corepack)
+- **crossplane**: CLI for interacting with crossplane
+- **kyverno**: CLI for interacting with Kyverno
+- **argocd**: CLI for interacting with ArgoCD
 
 ## Pre-installed Extensions
 
@@ -26,13 +29,27 @@ The following VS Code extensions are automatically installed:
 The devcontainer automatically:
 1. Enables yarn via corepack
 2. Installs Backstage dependencies
-3. Configures Node.js environment variables (including `NODE_TLS_REJECT_UNAUTHORIZED=0` for self-signed certificate support as required by Backstage)
+3. Configures Node.js environment
 4. Forwards ports 3000 (frontend) and 7007 (backend)
+5. Creates a Kind Cluster
+6. Installs Kyverno, ArgoCD, and Crossplane
+7. Configures Crossplane and Kyverno
+8. Setups RBAC for Backstage in the Kubernetes Cluster
 
 ## Getting Started
 
-After the Codespace starts:
+### While the Codespace starts:
 
+1. [Create Github PAT](https://github.com/settings/tokens/new)
+2. [Create Github Oauth App](https://github.com/settings/applications/new)
+    * Application Name: Backstage
+    * Homepage URL: http://localhost:3000
+    * Authorization Callback URL: http://localhost:7007/api/auth/github
+3. Copy the Client ID
+4. Create a Client Secret and copy it
+5. Update first User Manifests Username from vrabbi to your Github Username in [the relevant file](./backstage/examples/org.yaml)
+
+### After the Codespace starts
 1. **Set up GitHub credentials** (required for Backstage):
    ```bash
    export GITHUB_TOKEN="your_github_token"
@@ -41,12 +58,21 @@ After the Codespace starts:
    export GITHUB_OWNER="your_github_username"
    export GITHUB_REPO="your_repo_name"
    ```
-
-2. **Follow the setup instructions** in the main [README.md](../README.md) starting from "Create Kind Cluster"
-
+2. **Configure Argo AppSet**:
+   ```bash
+   envsubst <argo/app-set-template.yaml > argo/app-set-rendered.yaml
+   kubectl apply -f argo/app-set-rendered.yaml
+   ```
+3. **Export Kubernetes Cluster Details**:
+   ```bash
+   export KUBERNETES_URL=`kubectl config view --raw --minify -o jsonpath='{.clusters[0].cluster.server}'`
+   export KUBERNETES_SERVICE_ACCOUNT_TOKEN=`kubectl get secret -n backstage-system backstage-token -o jsonpath='{.data.token}' | base64 --decode`
+   ```
 3. **Start Backstage**:
    ```bash
    cd backstage
+   export NODE_OPTIONS="--max_old_space_size=8192 --no-node-snapshot"
+   export NODE_TLS_REJECT_UNAUTHORIZED=0
    yarn start
    ```
 
