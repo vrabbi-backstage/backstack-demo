@@ -7,10 +7,6 @@
       "helm": "latest",
       "minikube": "none"
     },
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {
-      "version": "latest",
-      "dockerDashComposeVersion": "v2"
-    },
     "ghcr.io/devcontainers-extra/features/kind:1": {
       "version": "latest"
     }
