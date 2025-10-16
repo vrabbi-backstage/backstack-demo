@@ -11,7 +11,7 @@
       "version": "latest",
       "dockerDashComposeVersion": "v2"
     },
-    "ghcr.io/guiyomh/features/kind:0": {
+    "ghcr.io/devcontainers-extra/features/kind:1": {
       "version": "latest"
     }
   },
