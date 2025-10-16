@@ -1,0 +1,11 @@
+{
+	"servers": {
+		"dev": {
+			"url": "http://localhost:7007/api/mcp-actions/v1",
+			"type": "http",
+			"headers": {
+				"Authorization": "Bearer k9lPknGFOGEiHSVuxo1PxKZ+8EfKXBkz"
+			}
+		}
+	}
+}

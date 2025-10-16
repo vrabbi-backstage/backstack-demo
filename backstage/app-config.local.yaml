@@ -25,6 +25,17 @@ organization:
   name: Backstack
 
 backend:
+  auth:
+    externalAccess:
+      - type: static
+        options:
+          token: k9lPknGFOGEiHSVuxo1PxKZ+8EfKXBkz
+          subject: mcp-clients
+  actions:
+    pluginSources:
+      - 'catalog'
+      - 'crossplane'
+      - 'kyverno'
   baseUrl: http://localhost:7007
   listen:
     port: 7007
@@ -54,6 +65,8 @@ techdocs:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
 
 auth:
+  experimentalDynamicClientRegistration:
+    enabled: true
   providers:
     guest: {}
     github:
@@ -90,7 +103,7 @@ permission:
 kubernetesIngestor:
   mappings:
     namespaceModel: 'default'
-    nameModel: 'name-kind'
+    nameModel: 'name'
     titleModel: 'name'
     systemModel: 'namespace'
     referencesNamespaceModel: 'default'
