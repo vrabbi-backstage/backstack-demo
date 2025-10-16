@@ -7,6 +7,10 @@
       "helm": "latest",
       "minikube": "none"
     },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "moby": false,
+      "version": "latest"
+    },
     "ghcr.io/devcontainers-extra/features/kind:1": {
       "version": "latest"
     }
