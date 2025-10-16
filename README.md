@@ -2,7 +2,7 @@
 
 This repository is configured for GitHub Codespaces! You can develop in a fully configured cloud environment with all dependencies pre-installed.
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=vrabbi-backstage/backstack-demo)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/vrabbi-backstage/backstack-demo)
 
 When using Codespaces, all prerequisites are automatically installed. See [.devcontainer/README.md](.devcontainer/README.md) for details.
 

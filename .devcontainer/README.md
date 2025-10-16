@@ -26,7 +26,7 @@ The following VS Code extensions are automatically installed:
 The devcontainer automatically:
 1. Enables yarn via corepack
 2. Installs Backstage dependencies
-3. Configures Node.js environment variables
+3. Configures Node.js environment variables (including `NODE_TLS_REJECT_UNAUTHORIZED=0` for self-signed certificate support as required by Backstage)
 4. Forwards ports 3000 (frontend) and 7007 (backend)
 
 ## Getting Started
