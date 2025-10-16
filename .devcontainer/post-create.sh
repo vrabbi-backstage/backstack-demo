@@ -2,11 +2,6 @@
 set -e
 
 echo "🚀 Setting up Backstack Demo environment..."
-
-# Enable yarn in corepack (Node.js 20 comes with corepack)
-echo "📦 Enabling yarn via corepack..."
-corepack enable
-
 # Navigate to backstage directory and install dependencies
 echo "📦 Installing Backstage dependencies..."
 cd backstage
