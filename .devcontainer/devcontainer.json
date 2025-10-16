@@ -1,0 +1,51 @@
+{
+  "name": "Backstack Demo",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "version": "latest",
+      "helm": "latest",
+      "minikube": "none"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "dockerDashComposeVersion": "v2"
+    },
+    "ghcr.io/guiyomh/features/kind:0": {
+      "version": "latest"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "redhat.vscode-yaml"
+      ],
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        }
+      }
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "forwardPorts": [3000, 7007],
+  "portsAttributes": {
+    "3000": {
+      "label": "Backstage Frontend",
+      "onAutoForward": "notify"
+    },
+    "7007": {
+      "label": "Backstage Backend",
+      "onAutoForward": "notify"
+    }
+  },
+  "remoteEnv": {
+    "NODE_OPTIONS": "--max_old_space_size=8192 --no-node-snapshot",
+    "NODE_TLS_REJECT_UNAUTHORIZED": "0"
+  }
+}
