@@ -56,7 +56,7 @@ echo "Configure Crossplane..."
 kubectl create clusterrolebinding --serviceaccount crossplane-system:crossplane --clusterrole cluster-admin allow-all-resources-crossplane
 kubectl apply -f crossplane/01-functions
 kubectl apply -f crossplane/02-providers
-kubectl wait --for condition=Healthy=true providers.p crossplane-contrib-provider-kubernetes
+kubectl wait --for condition=Healthy=true providers.p crossplane-contrib-provider-kubernetes --timeout 10m
 kubectl apply -f crossplane/03-provider-configs
 kubectl apply -f crossplane/04-xrds --recursive
 kubectl apply -f crossplane/05-compositions --recursive
