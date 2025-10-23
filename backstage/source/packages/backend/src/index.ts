@@ -70,4 +70,6 @@ backend.add(import('@backstage/plugin-auth-backend-module-github-provider'));
 backend.add(import('@terasky/backstage-plugin-crossplane-resources-backend'));
 backend.add(import('@terasky/backstage-plugin-scaffolder-backend-module-terasky-utils'));
 backend.add(import('@terasky/backstage-plugin-kyverno-policy-reports-backend'));
+backend.add(import('@terasky/backstage-plugin-ai-rules-backend'));
+backend.add(import('@backstage/plugin-mcp-actions-backend'))
 backend.start();

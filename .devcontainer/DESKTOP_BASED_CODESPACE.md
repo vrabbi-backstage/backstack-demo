@@ -2,21 +2,22 @@
 
 This directory contains the configuration for running the Backstack Demo in GitHub Codespaces.
 
+## Important Notes
+* While it can work with the default 2 CPU Core instance of a codespace, it is highly recommended to use at minimum the 4 CPU Core instance type for better performance and speed
+* When the browser opens up for backstage after starting it, if it opens up to http://127.0.0.1:3000 change this to http://localhost:3000 as otherwise the github authentication flow will fail
+
 ## Getting Started
 
 ### While the Codespace starts:
 
 1. [Create Github PAT](https://github.com/settings/tokens/new)
 2. [Create Github Oauth App](https://github.com/settings/applications/new)
-
-    * Get the values by running in the terminal of this codespace the following commands:
-    ```bash
-    echo "Application Name: Backstage"
-    echo "Homepage URL: https://${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
-    echo "Authorization Callback URL: https://${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/api/auth/github"
-    ```
+    * Application Name: Backstage
+    * Homepage URL: http://localhost:3000
+    * Authorization Callback URL: http://localhost:7007/api/auth/github
 3. Copy the Client ID
 4. Create a Client Secret and copy it
+5. Update first User Manifests Username from vrabbi to your Github Username in [the relevant file](../backstage/examples/org.yaml)
 
 ### After the Codespace starts
 1. **Set up GitHub credentials** (required for Backstage):
@@ -34,16 +35,16 @@ This directory contains the configuration for running the Backstack Demo in GitH
    ```
 3. **Export Kubernetes Cluster Details**:
    ```bash
+   export KUBERNETES_URL=`kubectl config view --raw --minify -o jsonpath='{.clusters[0].cluster.server}'`
    export KUBERNETES_SERVICE_ACCOUNT_TOKEN=`kubectl get secret -n backstage-system backstage-token -o jsonpath='{.data.token}' | base64 --decode`
    ```
-4. **Render Backstage Values File**:
+3. **Start Backstage**:
    ```bash
-   envsubst <backstage/values-templated.yaml > backstage/values-rendered.yaml
-   ```
-3. **Deploy Backstage**:
-   ```bash
-   helm repo add backstage https://backstage.github.io/charts
-   helm upgrade --install backstack backstage/backstage -n backstage-system -f backstage/values-rendered.yaml --wait
+   cd backstage/src
+   yarn install
+   export NODE_OPTIONS="--max_old_space_size=8192 --no-node-snapshot"
+   export NODE_TLS_REJECT_UNAUTHORIZED=0
+   yarn start
    ```
 
 ## Notes
@@ -51,3 +52,4 @@ This directory contains the configuration for running the Backstack Demo in GitH
 - The environment includes Docker-in-Docker support, allowing you to run kind clusters within the Codespace
 - All prerequisites mentioned in the main README are pre-installed
 - The workspace is configured with recommended VS Code settings for the project
+
