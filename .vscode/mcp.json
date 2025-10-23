@@ -1,0 +1,8 @@
+{
+	"servers": {
+		"dev": {
+			"url": "https://localhost/api/mcp-actions/v1",
+			"type": "http"
+		}
+	}
+}

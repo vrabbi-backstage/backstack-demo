@@ -2,39 +2,9 @@
 
 This directory contains the configuration for running the Backstack Demo in GitHub Codespaces.
 
-## What's Included
-
-The devcontainer is configured with:
-
-- **Node.js 20**: The required Node.js version for Backstage
-- **kubectl**: Kubernetes command-line tool
-- **helm**: Kubernetes package manager
-- **kind**: Kubernetes in Docker (for local cluster creation)
-- **Docker-in-Docker**: Required for kind and container operations
-- **Yarn 4**: Package manager (enabled via corepack)
-- **crossplane**: CLI for interacting with crossplane
-- **kyverno**: CLI for interacting with Kyverno
-- **argocd**: CLI for interacting with ArgoCD
-
-## Pre-installed Extensions
-
-The following VS Code extensions are automatically installed:
-- ESLint
-- Prettier
-- Kubernetes Tools
-- YAML support
-
-## Environment Setup
-
-The devcontainer automatically:
-1. Enables yarn via corepack
-2. Installs Backstage dependencies
-3. Configures Node.js environment
-4. Forwards ports 3000 (frontend) and 7007 (backend)
-5. Creates a Kind Cluster
-6. Installs Kyverno, ArgoCD, and Crossplane
-7. Configures Crossplane and Kyverno
-8. Setups RBAC for Backstage in the Kubernetes Cluster
+## Important Notes
+* While it can work with the default 2 CPU Core instance of a codespace, it is highly recommended to use at minimum the 4 CPU Core instance type for better performance and speed
+* When the browser opens up for backstage after starting it, if it opens up to http://127.0.0.1:3000 change this to http://localhost:3000 as otherwise the github authentication flow will fail
 
 ## Getting Started
 
@@ -47,7 +17,7 @@ The devcontainer automatically:
     * Authorization Callback URL: http://localhost:7007/api/auth/github
 3. Copy the Client ID
 4. Create a Client Secret and copy it
-5. Update first User Manifests Username from vrabbi to your Github Username in [the relevant file](./backstage/examples/org.yaml)
+5. Update first User Manifests Username from vrabbi to your Github Username in [the relevant file](../backstage/examples/org.yaml)
 
 ### After the Codespace starts
 1. **Set up GitHub credentials** (required for Backstage):
@@ -70,7 +40,8 @@ The devcontainer automatically:
    ```
 3. **Start Backstage**:
    ```bash
-   cd backstage
+   cd backstage/src
+   yarn install
    export NODE_OPTIONS="--max_old_space_size=8192 --no-node-snapshot"
    export NODE_TLS_REJECT_UNAUTHORIZED=0
    yarn start
@@ -81,3 +52,4 @@ The devcontainer automatically:
 - The environment includes Docker-in-Docker support, allowing you to run kind clusters within the Codespace
 - All prerequisites mentioned in the main README are pre-installed
 - The workspace is configured with recommended VS Code settings for the project
+

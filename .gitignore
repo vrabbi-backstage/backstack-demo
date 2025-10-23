@@ -1,55 +1,56 @@
 # macOS
-backstage/.DS_Store
+backstage/source/.DS_Store
 
 # Logs
-backstage/logs
-backstage/*.log
-backstage/npm-debug.log*
-backstage/yarn-debug.log*
+backstage/source/logs
+backstage/source/*.log
+backstage/source/npm-debug.log*
+backstage/source/yarn-debug.log*
 yarn-error.log*
 
 # Coverage directory generated when running tests with coverage
-backstage/coverage
+backstage/source/coverage
 
 # Dependencies
-backstage/node_modules/
+backstage/source/node_modules/
 
 # Yarn files
-backstage/.pnp.*
-backstage/.yarn/*
-!backstage/.yarn/patches
-!backstage/.yarn/plugins
-!backstage/.yarn/releases
-!backstage/.yarn/sdks
-!backstage/.yarn/versions
+backstage/source/.pnp.*
+backstage/source/.yarn/*
+!backstage/source/.yarn/patches
+!backstage/source/.yarn/plugins
+!backstage/source/.yarn/releases
+!backstage/source/.yarn/sdks
+!backstage/source/.yarn/versions
 
 # Node version directives
-backstage/.nvmrc
+backstage/source/.nvmrc
 
 # dotenv environment variables file
-backstage/.env
-backstage/.env.test
+backstage/source/.env
+backstage/source/.env.test
 
 # Build output
-backstage/dist
-backstage/dist-types
+backstage/source/dist
+backstage/source/dist-types
 
 # Temporary change files created by Vim
-backstage/*.swp
+backstage/source/*.swp
 
 # MkDocs build output
-backstage/site
+backstage/source/site
 
 # Sensitive credentials
-backstage/*-credentials.yaml
+backstage/source/*-credentials.yaml
 
 # vscode database functionality support files
-backstage/*.session.sql
+backstage/source/*.session.sql
 
 # E2E test reports
-backstage/e2e-test-report/
+backstage/source/e2e-test-report/
 
 # Cache
-backstage/.cache/
+backstage/source/.cache/
 
 argo/app-set-rendered.yaml
+backstage/values-rendered.yaml

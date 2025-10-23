@@ -39,14 +39,10 @@
     }
   },
   "postCreateCommand": "bash .devcontainer/post-create.sh",
-  "forwardPorts": [3000, 7007],
+  "forwardPorts": [443],
   "portsAttributes": {
-    "3000": {
-      "label": "Backstage Frontend",
-      "onAutoForward": "notify"
-    },
-    "7007": {
-      "label": "Backstage Backend",
+    "443": {
+      "label": "Backstage",
       "onAutoForward": "notify"
     }
   },

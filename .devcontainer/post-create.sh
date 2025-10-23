@@ -2,13 +2,13 @@
 set -e
 
 echo "Setting up Backstack Demo environment..."
-# Navigate to backstage directory and install dependencies
-echo "Installing Backstage dependencies..."
-cd backstage
-yarn install
-cd ..
-echo "Create Kind Cluster..."
-kind create cluster --name backstack-demo 
+kind create cluster --name backstack-demo --config kind/config.yaml
+
+echo "Install Cert Manager..."
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.19.1/cert-manager.yaml
+
+echo "Install Ingres NGINX..."
+kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
 
 echo "Install Kyverno..."
 helm repo add kyverno https://kyverno.github.io/kyverno/
@@ -65,10 +65,17 @@ kubectl apply -f crossplane/06-examples --recursive
 echo "Configure Kyverno..."
 kubectl apply -f kyverno/
 
+echo "Create Cluster Issuer..."
+kubectl apply -f cert-manager/ca-issuer.yaml
+
+echo "Install Metrics Server..."
+kubectl apply -k metrics-server/
+
 echo "Setup complete!"
 echo ""
 echo "Next steps:"
 echo "  1. Set up your environment variables (GITHUB_TOKEN, GITHUB_CLIENT_ID, etc.)"
 echo "  2. Render and Apply ArgoCD AppSet"
-echo "  3. Start Backstage: cd backstage && yarn start"
+echo "  3. Render Backstage values file"
+echo "  4. Deploy Backstage"
 echo ""
