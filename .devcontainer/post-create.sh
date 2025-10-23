@@ -9,10 +9,6 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 
 echo "Install Ingres NGINX..."
 kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/deploy-ingress-nginx.yaml
-kubectl wait --namespace ingress-nginx \
-  --for=condition=ready pod \
-  --selector=app.kubernetes.io/component=controller \
-  --timeout=5m
 
 echo "Install Kyverno..."
 helm repo add kyverno https://kyverno.github.io/kyverno/
@@ -71,6 +67,9 @@ kubectl apply -f kyverno/
 
 echo "Create Cluster Issuer..."
 kubectl apply -f cert-manager/ca-issuer.yaml
+
+echo "Install Metrics Server..."
+kubectl apply -k metrics-server/
 
 echo "Setup complete!"
 echo ""
