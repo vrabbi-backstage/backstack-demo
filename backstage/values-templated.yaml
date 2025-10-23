@@ -84,9 +84,13 @@ backstage:
           rules:
             - allow: [Component]
         - type: file
-          target: /app/backstage-org-config/users.yaml
+          target: /app/backstage-config/users.yaml
           rules:
             - allow: [User, Group]
+        - type: url
+          target: https://github.com/vrabbi-backstage/gitops-updater-template/blob/main/catalog-info.yaml
+          rules:
+            - allow: [Template]
     permission:
       enabled: false
     kubernetesIngestor:
@@ -183,12 +187,12 @@ backstage:
   - name: NODE_TLS_REJECT_UNAUTHORIZED
     value: "0"
   extraVolumeMounts:
-  - mountPath: /app/backstage-org-config
-    name: backstage-org-config
+  - mountPath: /app/backstage-config
+    name: backstage-config
   extraVolumes:
   - configMap:
-      name: backstage-org-config
-    name: backstage-org-config
+      name: backstage-config
+    name: backstage-config
   image:
     registry: ghcr.io
     repository: vrabbi/backstack-demo
@@ -242,4 +246,4 @@ extraDeploy:
         children: []
   kind: ConfigMap
   metadata:
-    name: backstage-org-config
+    name: backstage-config
