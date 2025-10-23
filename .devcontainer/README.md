@@ -2,52 +2,21 @@
 
 This directory contains the configuration for running the Backstack Demo in GitHub Codespaces.
 
-## What's Included
-
-The devcontainer is configured with:
-
-- **Node.js 20**: The required Node.js version for Backstage
-- **kubectl**: Kubernetes command-line tool
-- **helm**: Kubernetes package manager
-- **kind**: Kubernetes in Docker (for local cluster creation)
-- **Docker-in-Docker**: Required for kind and container operations
-- **Yarn 4**: Package manager (enabled via corepack)
-- **crossplane**: CLI for interacting with crossplane
-- **kyverno**: CLI for interacting with Kyverno
-- **argocd**: CLI for interacting with ArgoCD
-
-## Pre-installed Extensions
-
-The following VS Code extensions are automatically installed:
-- ESLint
-- Prettier
-- Kubernetes Tools
-- YAML support
-
-## Environment Setup
-
-The devcontainer automatically:
-1. Enables yarn via corepack
-2. Installs Backstage dependencies
-3. Configures Node.js environment
-4. Forwards ports 3000 (frontend) and 7007 (backend)
-5. Creates a Kind Cluster
-6. Installs Kyverno, ArgoCD, and Crossplane
-7. Configures Crossplane and Kyverno
-8. Setups RBAC for Backstage in the Kubernetes Cluster
-
 ## Getting Started
 
 ### While the Codespace starts:
 
 1. [Create Github PAT](https://github.com/settings/tokens/new)
 2. [Create Github Oauth App](https://github.com/settings/applications/new)
-    * Application Name: Backstage
-    * Homepage URL: http://localhost:3000
-    * Authorization Callback URL: http://localhost:7007/api/auth/github
+
+    * Get the values by running in the terminal of this codespace the following commands:
+    ```bash
+    echo "Application Name: Backstage"
+    echo "Homepage URL: https://${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
+    echo "Authorization Callback URL: https://${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/api/auth/github"
+    ```
 3. Copy the Client ID
 4. Create a Client Secret and copy it
-5. Update first User Manifests Username from vrabbi to your Github Username in [the relevant file](./backstage/examples/org.yaml)
 
 ### After the Codespace starts
 1. **Set up GitHub credentials** (required for Backstage):
@@ -65,15 +34,16 @@ The devcontainer automatically:
    ```
 3. **Export Kubernetes Cluster Details**:
    ```bash
-   export KUBERNETES_URL=`kubectl config view --raw --minify -o jsonpath='{.clusters[0].cluster.server}'`
    export KUBERNETES_SERVICE_ACCOUNT_TOKEN=`kubectl get secret -n backstage-system backstage-token -o jsonpath='{.data.token}' | base64 --decode`
    ```
-3. **Start Backstage**:
+4. **Render Backstage Values File**:
    ```bash
-   cd backstage
-   export NODE_OPTIONS="--max_old_space_size=8192 --no-node-snapshot"
-   export NODE_TLS_REJECT_UNAUTHORIZED=0
-   yarn start
+   envsubst <backstage/values-templated.yaml > backstage/values-rendered.yaml
+   ```
+3. **Deploy Backstage**:
+   ```bash
+   helm repo add backstage https://backstage.github.io/charts
+   helm upgrade --install backstack backstage/backstage -n backstage-system -f backstage/values-rendered.yaml --wait
    ```
 
 ## Notes
