@@ -1,0 +1,245 @@
+backstage:
+  appConfig:
+    app:
+      title: Backstack Kubecon 2025 NA Demo
+      baseUrl: https://${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/
+      packages: all
+      extensions:
+        - nav-item:search: false
+        - nav-item:user-settings: false
+        - nav-item:catalog: false
+        - nav-item:scaffolder: false
+        - entity-card:catalog/has-subcomponents: false
+        - entity-card:catalog/depends-on-components: false
+        - entity-card:catalog/depends-on-resources: false
+        - page:catalog:
+            config:
+              path: /
+    organization:
+      name: Backstack
+    backend:
+      auth:
+        externalAccess:
+          - type: static
+            options:
+              token: k9lPknGFOGEiHSVuxo1PxKZ+8EfKXBkz
+              subject: mcp-clients
+      actions:
+        pluginSources:
+          - 'catalog'
+          - 'crossplane'
+          - 'kyverno'
+      baseUrl: https://${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/
+      listen:
+        port: 7007
+      csp:
+        connect-src: ["'self'", 'http:', 'https:']
+      cors:
+        origin: https://${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/
+        methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
+        credentials: true
+      database:
+        client: better-sqlite3
+        connection: ':memory:'
+      reading:
+        allow:
+          - host: raw.githubusercontent.com
+    integrations:
+      github:
+        - host: github.com
+          token: ${GITHUB_TOKEN}
+    techdocs:
+      builder: 'local'
+      generator:
+        runIn: 'docker'
+      publisher:
+        type: 'local'
+    
+    auth:
+      experimentalDynamicClientRegistration:
+        enabled: true
+      providers:
+        guest: {}
+        github:
+          development:
+            clientId: ${GITHUB_CLIENT_ID}
+            clientSecret: ${GITHUB_CLIENT_SECRET}
+            signIn:
+              resolvers:
+                - resolver: usernameMatchingUserEntityName
+    
+    catalog:
+      import:
+        entityFilename: catalog-info.yaml
+        pullRequestBranchName: backstage-integration
+      rules:
+        - allow: [Component, System, API, Resource, Location, Template, User, Group]
+      locations:
+        - type: url
+          target: https://github.com/vrabbi-backstage/tf-module-template/blob/main/catalog-info.yaml
+          rules:
+            - allow: [Template]
+        - type: url
+          target: https://github.com/vrabbi/test-ai-rules/blob/main/catalog-info.yaml
+          rules:
+            - allow: [Component]
+        - type: file
+          target: /app/backstage-org-config/users.yaml
+          rules:
+            - allow: [User, Group]
+    permission:
+      enabled: false
+    kubernetesIngestor:
+      mappings:
+        namespaceModel: 'default'
+        nameModel: 'name'
+        titleModel: 'name'
+        systemModel: 'namespace'
+        referencesNamespaceModel: 'default'
+      components:
+        enabled: true
+        taskRunner:
+          frequency: 10
+          timeout: 600
+        excludedNamespaces:
+          - kube-public
+          - kube-system
+        customWorkloadTypes: []
+        disableDefaultWorkloadTypes: true
+        onlyIngestAnnotatedResources: false
+      crossplane:
+        claims:
+          ingestAllClaims: true
+        xrds:
+          convertDefaultValuesToPlaceholders: true
+          enabled: true
+          publishPhase:
+            allowRepoSelection: false
+            allowedTargets: ['github.com']
+            target: github
+            git:
+              repoUrl: github.com?owner=${GITHUB_OWNER}&repo=${GITHUB_REPO}
+              targetBranch: main
+          taskRunner:
+            frequency: 10
+            timeout: 600
+          ingestAllXRDs: true
+    crossplane:
+      enablePermissions: false
+    kyverno:
+      enablePermissions: false
+    kubernetes:
+      frontend:
+        podDelete:
+          enabled: true
+      serviceLocatorMethod:
+        type: 'singleTenant'
+      clusterLocatorMethods:
+        - type: 'config'
+          clusters:
+            - name: demo-cluster
+              authProvider: 'serviceAccount'
+              skipTLSVerify: true
+              url: https://kubernetes.default.svc.cluster.local:443
+              serviceAccountToken: ${KUBERNETES_SERVICE_ACCOUNT_TOKEN}
+    proxy:
+      endpoints:
+        '/github-raw':
+          target: 'https://raw.githubusercontent.com'
+          changeOrigin: true
+          headers:
+            Authorization: 'Token ${GITHUB_TOKEN}'
+        '/terraform-registry':
+          target: 'https://registry.terraform.io'
+          changeOrigin: true
+    aiRules:
+      allowedRuleTypes:
+        - 'cursor'
+        - 'copilot'
+        #! - 'cline'
+        #! - 'claude-code'
+      defaultRuleTypes: [copilot]
+    terraformScaffolder:
+      useProxyForGitHub: true
+      registryReferences:
+        returnAllVersions: true
+        namespaces:
+          - terraform-aws-modules
+          - vmware
+      moduleReferences:
+        - name: "ECR Module"
+          url: "https://github.com/terraform-aws-modules/terraform-aws-ecr"
+          refs:
+           - "v3.1.0"
+          description: "AWS ECR Module"
+        - name: "VPC Module"
+          url: "https://github.com/terraform-aws-modules/terraform-aws-vpc"
+          refs:
+           - "v6.0.1"
+          description: "AWS VPC Module"
+  extraEnvVars:
+  - name: NODE_OPTIONS
+    value: --no-node-snapshot
+  - name: NODE_TLS_REJECT_UNAUTHORIZED
+    value: "0"
+  extraVolumeMounts:
+  - mountPath: /app/backstage-org-config
+    name: backstage-org-config
+  extraVolumes:
+  - configMap:
+      name: backstage-org-config
+    name: backstage-org-config
+  image:
+    registry: ghcr.io
+    repository: vrabbi/backstack-demo
+    tag: 0.0.1
+  replicas: 1
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: my-ca-issuer
+  enabled: true
+  host: ${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}
+  path: /
+  tls:
+    enabled: true
+    secretName: backstack-tls
+  extraHosts:
+  - name: localhost
+extraDeploy:
+- apiVersion: v1
+  data:
+    users.yaml: |
+      ---
+      apiVersion: backstage.io/v1alpha1
+      kind: User
+      metadata:
+        name: ${GITHUB_USER}
+      spec:
+        memberOf: [guests]
+      ---
+      apiVersion: backstage.io/v1alpha1
+      kind: User
+      metadata:
+        name: guest
+      spec:
+        memberOf: [guests]
+      ---
+      # https://backstage.io/docs/features/software-catalog/descriptor-format#kind-group
+      apiVersion: backstage.io/v1alpha1
+      kind: Group
+      metadata:
+        name: guests
+      spec:
+        type: team
+        children: [kubernetes-auto-ingested]
+      ---
+      apiVersion: backstage.io/v1alpha1
+      kind: Group
+      metadata:
+        name: kubernetes-auto-ingested
+      spec:
+        type: team
+        children: []
+  kind: ConfigMap
+  metadata:
+    name: backstage-org-config

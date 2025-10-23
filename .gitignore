@@ -53,4 +53,4 @@ backstage/source/e2e-test-report/
 backstage/source/.cache/
 
 argo/app-set-rendered.yaml
-backstage/values-templated.yaml
+backstage/values-rendered.yaml
