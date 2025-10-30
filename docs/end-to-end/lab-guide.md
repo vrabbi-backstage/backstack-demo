@@ -1980,6 +1980,30 @@ The BACKStack approach supports platform maturity:
 - Cost optimization and chargeback
 </details>
 
+# Bringing AI Into The Mix
+<details>
+<summary>AI in the BACKStack</summary>
+## AI Plugins In Backstage
+One of the ways to integrate AI into our environment is by adding plugins into our Backstage instance.
+
+There are multiple options already available in the community for this:
+- [**Agent Forge**](https://github.com/backstage/community-plugins/tree/main/workspaces/agent-forge/plugins/agent-forge) - A Backstage plugin which integrates with the CNOE project called CAIPE (Commnity AI Platform Engineering) to provide specialized chatbots with specified Agents for different elements in the stack directly into the Backstage UI.
+- [**MCP Chat**](https://github.com/backstage/community-plugins/tree/main/workspaces/mcp-chat/plugins/mcp-chat) - A Backstage set of plugins providing a powerful MCP based chatbot directly in the Backstage UI
+- [**Copilot**](https://github.com/backstage/community-plugins/tree/main/workspaces/copilot/plugins/copilot) - A Backsytage set of plugins giving visibility and insights into GitHub Copilot usage within you companies GitHub organization
+- [**AWS Labs GenAI**](https://github.com/awslabs/backstage-plugins-for-aws/blob/main/plugins/genai/README.md) - A set of backstage plugins which provide a Chatbot interface in Backstage which can leverage the roader Backstage plugin ecosystem, by exposing different plugins endpoints as tools to the AI Agent.
+
+Each of these approaches are about bringing AI interfaces into Backstage, and each has a unique and powerful set of capabilities worth evaluating.
+
+Let's see another approach which is actually part of Backstage itself.
+
+## Backstage As An MCP Server
+Backstage has a new capability allowing us to turn Backstage into a remote MCP server, supporting both SSE and Streamable HTTP protocols. This capability also supports the MCP OAuth specification, supporting dynamic client registration. This allows us to expose backstage plugin capabilities as MCP tools in an aggregated MCP server provided by backstage, and for the same auth and RBAC which is configured in Backstage the portal to also be enforced in our MCP interface to Backstage!
+
+In this demo environment we have included a few plugins which implement the new MCP tool capabilities which we can test in this environment.
+
+### View configuration
+
+</details>
 # Summary
 <details>
 <summary>Summary Of The Workshop</summary>
