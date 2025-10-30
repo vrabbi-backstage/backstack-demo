@@ -26,4 +26,6 @@ The BACK Stack orchestrates a robust suite of open-source tools, each tackling a
 The BACK Stack tackles the intricate challenges of platform engineering head-on. Uniting these four projects delivers a unified, extensible, and cloud-agnostic platform that simplifies the entire software lifecycle. From development to deployment and maintenance, the BACK Stack provides a structured framework and the flexibility to tailor it to your needs. This holistic approach empowers collaboration, optimizes resources, and reduces the burden of managing disparate platforms.
 
 ## Exploring the Demo App
-To explore the different capabilities of the BACKStack and of what is deployed in this environment, follow the docs [here](./02-exploring-the-different-tools.md)
+To explore the different capabilities of the BACKStack and of what is deployed in this environment, you can go down either of the bellow approaches:
+1. End to end flow demo - follow the docs [here](./end-to-end/lab-guide.md)
+2. Component Overview and explanations - follow the docs [here](./component-docs/02-exploring-the-different-tools.md)

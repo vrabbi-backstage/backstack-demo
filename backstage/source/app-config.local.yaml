@@ -91,10 +91,6 @@ catalog:
       rules:
         - allow: [Template]
     - type: url
-      target: https://github.com/vrabbi-backstage/tf-module-template/blob/main/catalog-info.yaml
-      rules:
-        - allow: [Template]
-    - type: url
       target: https://github.com/vrabbi/test-ai-rules/blob/main/catalog-info.yaml
       rules:
         - allow: [Component]
@@ -159,16 +155,6 @@ kubernetes:
           skipTLSVerify: true
           url: ${KUBERNETES_URL}
           serviceAccountToken: ${KUBERNETES_SERVICE_ACCOUNT_TOKEN}
-proxy:
-  endpoints:
-    '/github-raw':
-      target: 'https://raw.githubusercontent.com'
-      changeOrigin: true
-      headers:
-        Authorization: 'Token ${GITHUB_TOKEN}'
-    '/terraform-registry':
-      target: 'https://registry.terraform.io'
-      changeOrigin: true
 aiRules:
   allowedRuleTypes:
     - 'cursor'
@@ -177,20 +163,5 @@ aiRules:
     #! - 'claude-code'
   defaultRuleTypes: [copilot]
 terraformScaffolder:
-  useProxyForGitHub: true
-  registryReferences:
-    returnAllVersions: true
-    namespaces:
-      - terraform-aws-modules
-      - vmware
-  moduleReferences:
-    - name: "ECR Module"
-      url: "https://github.com/terraform-aws-modules/terraform-aws-ecr"
-      refs:
-       - "v3.1.0"
-      description: "AWS ECR Module"
-    - name: "VPC Module"
-      url: "https://github.com/terraform-aws-modules/terraform-aws-vpc"
-      refs:
-       - "v6.0.1"
-      description: "AWS VPC Module"
+      useProxyForGitHub: false
+      moduleReferences: []
