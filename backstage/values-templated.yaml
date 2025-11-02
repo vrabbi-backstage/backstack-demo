@@ -183,7 +183,7 @@ ingress:
 extraDeploy:
 - apiVersion: v1
   data:
-    users.yaml: |
+    config.yaml: |
       ---
       apiVersion: backstage.io/v1alpha1
       kind: User

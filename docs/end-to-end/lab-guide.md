@@ -1980,6 +1980,187 @@ The BACKStack approach supports platform maturity:
 - Cost optimization and chargeback
 </details>
 
+# Bringing AI Into The Mix
+<details>
+<summary>AI in the BACKStack</summary>
+
+## AI Plugins In Backstage
+One of the ways to integrate AI into our environment is by adding plugins into our Backstage instance.
+
+There are multiple options already available in the community for this:
+- [**Agent Forge**](https://github.com/backstage/community-plugins/tree/main/workspaces/agent-forge/plugins/agent-forge) - A Backstage plugin which integrates with the CNOE project called CAIPE (Commnity AI Platform Engineering) to provide specialized chatbots with specified Agents for different elements in the stack directly into the Backstage UI.  
+
+![Agent Forge](../images/ai/agent-forge.png)
+  
+- [**MCP Chat**](https://github.com/backstage/community-plugins/tree/main/workspaces/mcp-chat/plugins/mcp-chat) - A Backstage set of plugins providing a powerful MCP based chatbot directly in the Backstage UI
+  
+![MCP Chat](../images/ai/mcp-chat.png)
+  
+- [**Copilot**](https://github.com/backstage/community-plugins/tree/main/workspaces/copilot/plugins/copilot) - A Backsytage set of plugins giving visibility and insights into GitHub Copilot usage within you companies GitHub organization
+  
+![Copilot](../images/ai/copilot.gif)
+  
+- [**AWS Labs GenAI**](https://github.com/awslabs/backstage-plugins-for-aws/blob/main/plugins/genai/README.md) - A set of backstage plugins which provide a Chatbot interface in Backstage which can leverage the roader Backstage plugin ecosystem, by exposing different plugins endpoints as tools to the AI Agent.
+  
+![AWS](../images/ai/aws.png)
+  
+
+Each of these approaches are about bringing AI interfaces into Backstage, and each has a unique and powerful set of capabilities worth evaluating.
+
+Another approach is to utilize MCP servers for some of the relevant projects, which have official MCP servers.
+
+## BACKStack MCP Servers
+- [**ArgoCD MCP Server**](https://github.com/argoproj-labs/mcp-for-argocd)
+- [**Kyverno MCP Server**](https://github.com/nirmata/kyverno-mcp)
+  
+
+While Crossplane does not have an official MCP Server, as it is based on Kubernetes completely, any Good Kubernetes MCP server good be used to gain some benefit for Crossplane as well such as:
+- [**Containers Org Kubernetes MCP Server**](https://github.com/containers/kubernetes-mcp-server)
+- [**Flux159 Kubernetes MCP Server**](https://github.com/Flux159/mcp-server-kubernetes)
+
+This just leaves Backstage. Actually Backstage has a built-in MCP server which takes a very unique and powerfull approach.
+
+## Backstage As An MCP Server
+Backstage has a new capability since Backstage 1.40, allowing us to turn Backstage into a remote MCP server, supporting both SSE (deprecated) and Streamable HTTP protocols. This capability also supports the MCP OAuth specification, supporting dynamic client registration. This allows us to expose backstage plugin capabilities as MCP tools in an aggregated MCP server provided by backstage, and for the same auth and RBAC which is configured in Backstage the portal to also be enforced in our MCP interface to Backstage!
+
+In this demo einvironment we have included a few plugins which implement the new MCP tool capabilities which we can test in this environment.
+
+### View configuration
+In your environment you can navigate to the relevant MCP config file located [here](../../.vscode/mcp.json)
+  
+![MCP JSON](../images/ai/mcp-json.png)
+  
+As you can see we have a simple MCP JSON which is pointing at our backstage instance. no authentication details are added to this file, as we will be utilizing the new support for OAuth integration in the MCP server to utilize our Backstage credentials instead of hard coding a token.
+
+Before we can utilize this MCP server, in Codespaces, you must change the relevant port forwarding instance to be a publicly visibile port.
+1. Go to the the **ports** tab
+2. Right click on the line of the port **443** port forwarding configuration
+3. under the submenu titled **Port Visibility** select **Public**
+
+Now that our port is configured as a publicly available port, we can go back to our [MCP JSON file](../../.vscode/mcp.json) and make one final change.
+
+We need to change the URL from localhost to be the FQDN of our backstage instance which can be done by running:
+```bash
+sed -i "s/localhost/${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/g" .vscode/mcp.json
+```
+
+Finally we can click on the start button in the JSON file above the Backstage MCP server to start the MCP Server connection.
+
+### Auth Flow
+- You will be asked to allow the auth flow which we must allow
+
+![Allow Auth](../images/ai/allow-auth-flow.png)
+
+- Next we may be asked to acknowledge we are accessing a codespaces port-forwarded address and we should click **continue**.
+
+![Access Dev Port](../images/ai/allow-access-to-codespace-port.png)
+
+- Next we will be redirected to a Backstage Login page if not already logged into Backstage, and we should auth with the GitHub authentication
+
+![Login Screen](../images/ai/oauth-login.png)
+
+- Now we need to allow VSCode access to Backstage by clicking **Authorize**
+
+![Authorize](../images/ai/allow-vscode-to-auth.png)
+
+- Finally We will see that Authentication succeeded and we can close the browser tab
+
+![Auth Done](../images/ai/auth-done.png)
+
+Now that the MCP server is added, configured and authenticated we should see that it has discoverewd 8 tools!
+
+![running MCP Server](../images/ai/running-json.png)
+
+Let's explore the available tools, and what they can provide us.
+
+### Exploring the Available tools
+In the Codespaces Copilot Chat Tab make sure the mode is set to **Agent** and that preferably a Claude model is selected for best results.
+
+![Settings](../images/ai/copilot-chat-settings.png)
+
+Now that the chat is configured lets ask it what tools it has available for example asking:
+
+```text
+what mcp tools do you have available?
+```
+
+We will get a response similar to:
+
+```md
+I have the following MCP (Model Context Protocol) tools available:
+
+Backstage Catalog Tools:
+* mcp_dev_get-catalog-entity - Get a single entity from the software catalog by name, kind, and namespace
+
+* mcp_dev_validate-entity - Validate catalog-info.yaml file contents for syntax and entity rules
+
+
+Crossplane Tools:
+* mcp_dev_get_crossplane_resources - Get Crossplane resources and their dependencies for a Backstage entity
+
+* mcp_dev_get_crossplane_resource_graph - Get a graph of related Crossplane resources (V1 API)
+
+* mcp_dev_get_crossplane_events - Get events for a specific Crossplane resource
+
+Kyverno Policy Tools:
+* mcp_dev_get_kyverno_policy_reports - Get policy reports for a given entity
+
+* mcp_dev_get_kyverno_crossplane_policy_reports - Get policy reports for Crossplane resources (claims and composites) associated with an entity
+
+* mcp_dev_get_kyverno_policy - Get details of a specific Kyverno policy
+These tools integrate with your Backstage environment to query the software catalog, inspect Crossplane infrastructure resources, and check Kyverno policy compliance for entities and resources in your Kubernetes clusters.
+```
+
+So now that we see what is available let's ask it some questions:
+
+```text
+get my backstage catalog entity my-web-app, and find the crossplane resources related to it, as well as any policy violations for these resources
+```
+
+Follow Up query:
+
+```text
+explain to me the full policy which im failing on for this entity
+```
+
+While this is a simple example, it shows what is possible with this new and unique approach.
+
+Let's see what it takes to expose a tool from a plugin.
+
+For example in our Kyverno plugin we have 3 tools configured. lets explore one of them which can be seen [here](https://github.com/TeraSky-OSS/backstage-plugins/blob/b18caab88f503cbbd041c1d65f10c44790d4d4d9/plugins/kyverno-policy-reports-backend/src/actions.ts#L68-L98).
+
+As we can see in that file, we are simple registering a new action/tool with a title, name and description, providing the input and output schemas using zod, and finally, we have an action section where we are calling the existing backend function **service.getPolicy** with the inputted data and returning our data back to the AI Agent from the MCP tool.
+
+In this approach we have complete reuse of the backend logic, with a simple wrapper around the core logic, while not requiring any AI or MCP specific knowledge to get this running. 
+
+One of the great elements of this feature as well, is that all of these MCP tools we expose are not just available as MCP tools, but they are also made available as Scaffolder actions, which we can use in our Software Templates.
+
+To see the actions available in our instance we can get to the ***Create** tab in our backstage instance
+
+![Create](../images/ai/create.png)
+
+We can then click on the 3 dots at the top to show the available options
+
+![OPtions](../images/ai/options.png)
+
+And if we select **Installed Actions** we can see the auto-generated docs for the installed and available Scaffolder actions.
+
+![available actions](../images/ai/installed-actions.png)
+
+And we can then search for one of our actions, which when created as MCP tools like in this example, are prefixed with the plugin name they are registered from for example crossplane or kyverno
+
+![crossplane tool docs](../images/ai/crossplane-example.png)
+
+### Value Proposition of the BAckstage MCP Approach
+The Backstage MCP approach is a unique approach which has the following key benefits:
+* Support for easily exposing Backstage core functionality as well as any plugins features as MCP tools with very little extra config or code.
+* Allow sharing nearly all logic between the MCP tools and the Backend plugins methods being used by the frontend
+* Allows defining authn/authz once and using the same constructs across different interfaces
+* Allows for a single MCP server to be configured in End Users systems, with support for countless backend tool providers based on the plugins available in your Backstage instance
+* Allows using the same MCP tools via systems like Cursor or Copilot, as well as in Scaffolder Software Templates, again reducing maintenance, duplication of code, and divergence of features across different interfaces.
+
+</details>
+  
 # Summary
 <details>
 <summary>Summary Of The Workshop</summary>
