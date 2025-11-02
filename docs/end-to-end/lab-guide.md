@@ -1346,7 +1346,7 @@ After review, merge the PR. ArgoCD will detect the change and sync it to the clu
 If you don't want to wait for the automatic sync interval, you can manually trigger a sync:
 
 ```bash
-kubectl patch app backstack-demo-app-app -n argocd \
+kubectl patch application backstack-demo-app-demo-app-01 -n argocd \
   --type merge \
   -p '{"operation":{"initiatedBy":{"username":"admin"},"sync":{"syncStrategy":{"hook":{"force":true}}}}}'
 ```
@@ -1863,7 +1863,7 @@ We can then navigate to the GitOps repo, and we can approve the PR after checkin
 And finally to save time and not wait for reconciliation of ArgoCD we can manually trigger the sync of the application managing this Database resource
 
 ```bash
-kubectl patch app backstack-demo-database-database -n argocd \
+kubectl patch application backstack-demo-database-db-test-01 -n argocd \
   --type merge \
   -p '{"operation":{"initiatedBy":{"username":"admin"},"sync":{"syncStrategy":{"hook":{"force":true}}}}}'
 ```

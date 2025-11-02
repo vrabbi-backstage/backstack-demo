@@ -53,4 +53,4 @@ This directory contains the configuration for running the Backstack Demo in GitH
 - The workspace is configured with recommended VS Code settings for the project
 
 ## Explore the app
-To explore the different capabilities of the BACKStack and this implementation of the stack, we recommend fullowing our [Getting Started Guide](./docs/01-getting-started.md)
+To explore the different capabilities of the BACKStack and this implementation of the stack, we recommend fullowing our [Getting Started Guide](../docs/01-getting-started.md)
