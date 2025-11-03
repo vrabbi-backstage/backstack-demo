@@ -33,6 +33,8 @@ backstage/source/.env.test
 # Build output
 backstage/source/dist
 backstage/source/dist-types
+backstage/source/app/dist
+backstage/source/backend/dist
 
 # Temporary change files created by Vim
 backstage/source/*.swp
