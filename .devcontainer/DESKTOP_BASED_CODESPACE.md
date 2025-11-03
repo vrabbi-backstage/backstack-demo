@@ -17,7 +17,7 @@ This directory contains the configuration for running the Backstack Demo in GitH
     * Authorization Callback URL: http://localhost:7007/api/auth/github
 3. Copy the Client ID
 4. Create a Client Secret and copy it
-5. Update first User Manifests Username from vrabbi to your Github Username in [the relevant file](../backstage/examples/org.yaml)
+5. Update first User Manifests Username from vrabbi to your Github Username in [the relevant file](../backstage/source/examples/org.yaml)
 
 ### After the Codespace starts
 1. **Set up GitHub credentials** (required for Backstage):
@@ -41,7 +41,7 @@ This directory contains the configuration for running the Backstack Demo in GitH
    ```
 3. **Start Backstage**:
    ```bash
-   cd backstage/src
+   cd backstage/source
    yarn install
    export NODE_OPTIONS="--max_old_space_size=8192 --no-node-snapshot"
    export NODE_TLS_REJECT_UNAUTHORIZED=0
