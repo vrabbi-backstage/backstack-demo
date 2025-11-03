@@ -90,6 +90,7 @@ backstage:
     permission:
       enabled: false
     kubernetesIngestor:
+      argoIntegration: true
       mappings:
         namespaceModel: 'default'
         nameModel: 'name'
@@ -152,6 +153,14 @@ backstage:
     terraformScaffolder:
       useProxyForGitHub: false
       moduleReferences: []
+    argocd:
+      username: admin
+      password: ${ARGOCD_ADMIN_PASSWORD}
+      appLocatorMethods:
+        - type: 'config'
+          instances:
+            - name: demo-instance
+              url: https://argocd-server.argocd.svc.cluster.local
   extraEnvVars:
   - name: NODE_OPTIONS
     value: --no-node-snapshot
@@ -167,7 +176,7 @@ backstage:
   image:
     registry: ghcr.io
     repository: vrabbi/backstack-demo
-    tag: 0.0.1
+    tag: 0.0.3
   replicas: 1
 ingress:
   annotations:

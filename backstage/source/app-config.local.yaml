@@ -103,6 +103,7 @@ permission:
   enabled: false
 
 kubernetesIngestor:
+  
   mappings:
     namespaceModel: 'default'
     nameModel: 'name'
