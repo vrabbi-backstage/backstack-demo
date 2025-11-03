@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd
+  namespace: argocd
+  annotations:
+    cert-manager.io/cluster-issuer: my-ca-issuer
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"   # argocd-server serves HTTPS on 443
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: 
+      - REPLACE_ME
+      secretName: tls-cert
+  rules:
+    - host: REPLACE_ME
+      http:
+        paths:
+          - path: /argocd
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 443
+    - host: localhost
+      http:
+        paths:
+          - path: /argocd
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port:
+                  number: 443

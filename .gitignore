@@ -55,4 +55,8 @@ backstage/source/e2e-test-report/
 backstage/source/.cache/
 
 argo/app-set-rendered.yaml
+argo/ingress.yaml
 backstage/values-rendered.yaml
+crossplane/04-xrds/dbaas/
+crossplane/05-compositions/dbaas/
+kyverno/deprecate-old-psql-versions.yaml

@@ -71,6 +71,13 @@ kubectl apply -f cert-manager/ca-issuer.yaml
 echo "Install Metrics Server..."
 kubectl apply -k metrics-server/
 
+echo "Configure ArgoCD Ingress..."
+sed "s|REPLACE_ME|${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}|g" argo/ingress-template.yaml > argo/ingress.yaml
+kubectl apply -f argo/ingress.yaml
+kubectl -n argocd patch cm argocd-cmd-params-cm --type merge -p '{"data":{"server.rootpath":"/argocd","server.basehref":"/argocd"}}'
+kubectl -n argocd patch cm argocd-cm --type merge -p "{\"data\":{\"url\":\"https://${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/argocd\"}}"
+kubectl -n argocd rollout restart deploy/argocd-server
+
 echo "Setup complete!"
 echo ""
 echo "Next steps:"
