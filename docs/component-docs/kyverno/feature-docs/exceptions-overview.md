@@ -34,14 +34,14 @@ metadata:
   namespace: production
 spec:
   exceptions:
-  - ruleNames:
-    - check-privileged-container
-    - check-host-network
-    policyName: pod-security-standard
+    - ruleNames:
+        - check-privileged-container
+        - check-host-network
+      policyName: pod-security-standard
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       selector:
         matchLabels:
           app: legacy-billing-app
@@ -63,15 +63,15 @@ metadata:
   namespace: ci-cd
 spec:
   exceptions:
-  - ruleNames:
-    - validate-image-registry
-    policyName: image-policy
+    - ruleNames:
+        - validate-image-registry
+      policyName: image-policy
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       names:
-      - jenkins-master-*
+        - jenkins-master-*
 ```
 
 ### Namespace-Wide Exceptions
@@ -83,17 +83,17 @@ apiVersion: kyverno.io/v1
 kind: PolicyException
 metadata:
   name: dev-environment-exemption
-  namespace: kyverno  # Cluster-level exception
+  namespace: kyverno # Cluster-level exception
 spec:
   exceptions:
-  - ruleNames:
-    - validate-security-context
-    - enforce-resource-limits
-    policyName: pod-security-standard
+    - ruleNames:
+        - validate-security-context
+        - enforce-resource-limits
+      policyName: pod-security-standard
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       namespaceSelector:
         matchLabels:
           environment: development
@@ -110,13 +110,13 @@ metadata:
   name: exception-third-party-app
 spec:
   exceptions:
-  - ruleNames:
-    - check-image-signature
-    policyName: supply-chain-security
+    - ruleNames:
+        - check-image-signature
+      policyName: supply-chain-security
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       selector:
         matchLabels:
           vendor: third-party
@@ -135,16 +135,16 @@ metadata:
   namespace: kyverno
 spec:
   exceptions:
-  - ruleNames:
-    - enforce-all-rules
-    policyName: security-baseline
+    - ruleNames:
+        - enforce-all-rules
+      policyName: security-baseline
   match:
     subjects:
-    - kind: User
-      name: system:admin
-    - kind: ServiceAccount
-      name: kyverno-admin
-      namespace: kyverno
+      - kind: User
+        name: system:admin
+      - kind: ServiceAccount
+        name: kyverno-admin
+        namespace: kyverno
 ```
 
 ### Time-Limited Exceptions
@@ -162,13 +162,13 @@ metadata:
     reason: "Database migration window"
 spec:
   exceptions:
-  - ruleNames:
-    - require-pod-security
-    policyName: pod-security-standard
+    - ruleNames:
+        - require-pod-security
+      policyName: pod-security-standard
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       selector:
         matchLabels:
           component: database-migration
@@ -185,14 +185,14 @@ metadata:
   name: exception-mutation-rules-only
 spec:
   exceptions:
-  - ruleNames:
-    - add-default-network-policy    # Only this rule
-    - inject-monitoring-sidecar     # Only this rule
-    policyName: infrastructure-policy
+    - ruleNames:
+        - add-default-network-policy # Only this rule
+        - inject-monitoring-sidecar # Only this rule
+      policyName: infrastructure-policy
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       namespaceSelector:
         matchLabels:
           legacy: "true"
@@ -214,15 +214,15 @@ metadata:
   namespace: ci-cd
 spec:
   exceptions:
-  - ruleNames:
-    - check-privileged-container
-    policyName: pod-security
+    - ruleNames:
+        - check-privileged-container
+      policyName: pod-security
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       names:
-      - jenkins-*
+        - jenkins-*
 ```
 
 #### Comprehensive Exception
@@ -243,18 +243,18 @@ metadata:
     exception-id: "EXC-2024-0152"
 spec:
   exceptions:
-  - ruleNames:
-    - validate-resource-limits
-    - check-security-context
-    - verify-image-signature
-    policyNames:
-    - pod-security
-    - security-baseline
+    - ruleNames:
+        - validate-resource-limits
+        - check-security-context
+        - verify-image-signature
+      policyNames:
+        - pod-security
+        - security-baseline
   match:
     resources:
       kinds:
-      - Pod
-      - Deployment
+        - Pod
+        - Deployment
       selector:
         matchLabels:
           workload: data-processing
@@ -264,11 +264,11 @@ spec:
         team: data-processing
   conditions:
     all:
-    - key: "{{request.operation}}"
-      operator: In
-      value:
-      - CREATE
-      - UPDATE
+      - key: "{{request.operation}}"
+        operator: In
+        value:
+          - CREATE
+          - UPDATE
 ```
 
 ### Exception Scope
@@ -281,7 +281,7 @@ Managed by team, applies to their namespace:
 apiVersion: kyverno.io/v1
 kind: PolicyException
 metadata:
-  namespace: team-a  # Team-scoped
+  namespace: team-a # Team-scoped
   name: team-a-exceptions
 ```
 
@@ -293,7 +293,7 @@ Managed by cluster admin, applies across cluster:
 apiVersion: kyverno.io/v1
 kind: PolicyException
 metadata:
-  namespace: kyverno  # Cluster-scoped convention
+  namespace: kyverno # Cluster-scoped convention
   name: cluster-exceptions
 ```
 
@@ -368,16 +368,16 @@ metadata:
     owner: "platform-team"
 spec:
   exceptions:
-  - ruleNames:
-    - require-non-root
-    - require-resource-limits
-    - verify-image-source
-    policyName: pod-security-standard
+    - ruleNames:
+        - require-non-root
+        - require-resource-limits
+        - verify-image-source
+      policyName: pod-security-standard
   match:
     resources:
       kinds:
-      - Pod
-      - Deployment
+        - Pod
+        - Deployment
       selector:
         matchLabels:
           app: legacy-billing
@@ -398,14 +398,14 @@ metadata:
     why: "Third-party SaaS doesn't support custom security context"
 spec:
   exceptions:
-  - ruleNames:
-    - enforce-security-context
-    - require-pod-service-account
-    policyName: pod-security-standard
+    - ruleNames:
+        - enforce-security-context
+        - require-pod-service-account
+      policyName: pod-security-standard
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       selector:
         matchLabels:
           app: datadog-agent
@@ -428,14 +428,14 @@ metadata:
     expires: "2024-03-16T18:00:00Z"
 spec:
   exceptions:
-  - ruleNames:
-    - check-pod-priority
-    - enforce-disruption-budget
-    policyName: availability-policy
+    - ruleNames:
+        - check-pod-priority
+        - enforce-disruption-budget
+      policyName: availability-policy
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       selector:
         matchLabels:
           migration: database-v8-upgrade
@@ -456,15 +456,15 @@ metadata:
     purpose: "Allow rapid iteration and experimentation"
 spec:
   exceptions:
-  - ruleNames:
-    - enforce-all-rules
-    policyName: pod-security-standard
+    - ruleNames:
+        - enforce-all-rules
+      policyName: pod-security-standard
   match:
     resources:
       kinds:
-      - Pod
-      - Deployment
-      - StatefulSet
+        - Pod
+        - Deployment
+        - StatefulSet
       namespaceSelector:
         matchLabels:
           environment: development
@@ -489,15 +489,15 @@ metadata:
     expires-at: "2024-03-16T02:30:00Z"
 spec:
   exceptions:
-  - ruleNames:
-    - all  # All rules exempted
-    policyNames:
-    - pod-security-standard
-    - network-policy
+    - ruleNames:
+        - all # All rules exempted
+      policyNames:
+        - pod-security-standard
+        - network-policy
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       selector:
         matchLabels:
           incident-response: INC-20240315-001
@@ -591,14 +591,14 @@ kubectl get policyexceptions -A -o json | jq -r '.items[].spec.exceptions[].poli
 echo ""
 echo "Expiring Exceptions (next 30 days):"
 CUTOFF=$(date -d "+30 days" +%s)
-kubectl get policyexceptions -A -o json | jq -r '.items[] | 
-  select(.metadata.annotations["expires-at"] | 
-  fromdate <= '${CUTOFF}') | 
+kubectl get policyexceptions -A -o json | jq -r '.items[] |
+  select(.metadata.annotations["expires-at"] |
+  fromdate <= '${CUTOFF}') |
   "\(.metadata.namespace): \(.metadata.name) - expires: \(.metadata.annotations["expires-at"])"'
 
 echo ""
 echo "High-Risk Exceptions (exempting security rules):"
-kubectl get policyexceptions -A -o json | jq -r '.items[] | 
+kubectl get policyexceptions -A -o json | jq -r '.items[] |
   select(.spec.exceptions[].ruleNames[] | contains("security") or contains("privileged")) |
   "\(.metadata.namespace): \(.metadata.name) - rules: \(.spec.exceptions[].ruleNames[])"'
 ```
@@ -619,13 +619,13 @@ metadata:
   name: datadog-agent-exception
 spec:
   exceptions:
-  - ruleNames:
-    - check-host-network
-    policyName: pod-security-standard
+    - ruleNames:
+        - check-host-network
+      policyName: pod-security-standard
   match:
     resources:
       kinds:
-      - DaemonSet
+        - DaemonSet
       selector:
         matchLabels:
           app: datadog-agent
@@ -713,13 +713,13 @@ metadata:
   namespace: ci-cd
 spec:
   exceptions:
-  - ruleNames:
-    - require-non-root
-    policyName: pod-security-standard
+    - ruleNames:
+        - require-non-root
+      policyName: pod-security-standard
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       selector:
         matchLabels:
           jenkins-agent: "true"
@@ -735,15 +735,15 @@ metadata:
   namespace: databases
 spec:
   exceptions:
-  - ruleNames:
-    - validate-volume-types
-    policyName: storage-policy
+    - ruleNames:
+        - validate-volume-types
+      policyName: storage-policy
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       names:
-      - backup-*
+        - backup-*
 ```
 
 ### Scenario 3: GPU Workload Needs Privileged Mode
@@ -756,13 +756,13 @@ metadata:
   namespace: ml-team
 spec:
   exceptions:
-  - ruleNames:
-    - check-privileged
-    policyName: pod-security-standard
+    - ruleNames:
+        - check-privileged
+      policyName: pod-security-standard
   match:
     resources:
       kinds:
-      - Pod
+        - Pod
       selector:
         matchLabels:
           workload: gpu-compute
@@ -777,11 +777,13 @@ spec:
 **Problem**: Exception created but policy still blocks resource
 
 **Causes**:
+
 - Exception namespace doesn't match
 - Selector labels don't match
 - Policy name misspelled
 
 **Solution**:
+
 ```bash
 # Verify exception exists
 kubectl get policyexceptions -A
@@ -798,6 +800,7 @@ kubectl get pods -l app=my-app --all-namespaces
 **Problem**: Exception exempts more than intended
 
 **Solution**:
+
 ```bash
 # Make exception more specific with additional selectors
 kubectl patch policyexception my-exception --type merge -p \

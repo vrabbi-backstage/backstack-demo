@@ -49,6 +49,7 @@ Example: An `Database` composite resource might abstract away provider-specific 
 Managed Resources are Kubernetes representations of cloud provider resources (EC2 instances, RDS databases, etc.). Crossplane provides providers for AWS, Azure, GCP, and others.
 
 Key characteristics:
+
 - Each provider publishes their own Managed Resource types
 - They use status fields to track real cloud resources
 - They support drift detection and auto-healing
@@ -111,6 +112,7 @@ When a user creates a composite resource, Crossplane executes a composition pipe
 ### With Kubernetes
 
 Crossplane leverages core Kubernetes capabilities:
+
 - **CRDs** (Custom Resource Definitions) - Define composite and managed resources
 - **Operators Pattern** - Controllers reconcile desired state
 - **RBAC** - Control who can create/manage resources
@@ -119,6 +121,7 @@ Crossplane leverages core Kubernetes capabilities:
 ### With Cloud Providers
 
 Each Crossplane provider integrates with cloud APIs through:
+
 - **Service Accounts/IAM Roles** - Authenticate to cloud providers
 - **Webhooks** - Receive lifecycle events
 - **APIs** - Create, read, update, delete cloud resources
@@ -126,6 +129,7 @@ Each Crossplane provider integrates with cloud APIs through:
 ### With GitOps Systems
 
 Crossplane complements GitOps tooling:
+
 - Composite resources and managed resources stored in Git
 - GitOps operators (Argo CD, Flux) deploy and synchronize changes
 - Single source of truth for infrastructure state

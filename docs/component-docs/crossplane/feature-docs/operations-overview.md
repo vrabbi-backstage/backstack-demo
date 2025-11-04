@@ -29,7 +29,7 @@ kind: CronOperation
 metadata:
   name: daily-backup
 spec:
-  schedule: "0 2 * * *"  # 2 AM UTC every day
+  schedule: "0 2 * * *" # 2 AM UTC every day
   resourceRef:
     apiVersion: database.example.com/v1
     kind: Database
@@ -71,7 +71,7 @@ kind: CronOperation
 metadata:
   name: db-backup
 spec:
-  schedule: "0 3 * * *"  # 3 AM daily
+  schedule: "0 3 * * *" # 3 AM daily
   resourceRef:
     apiVersion: rds.aws.crossplane.io/v1beta1
     kind: DBInstance
@@ -92,7 +92,7 @@ kind: CronOperation
 metadata:
   name: maintenance-window
 spec:
-  schedule: "0 2 * * 0"  # 2 AM every Sunday
+  schedule: "0 2 * * 0" # 2 AM every Sunday
   resourceRef:
     apiVersion: rds.aws.crossplane.io/v1beta1
     kind: DBInstance
@@ -112,7 +112,7 @@ kind: CronOperation
 metadata:
   name: monthly-scaling-check
 spec:
-  schedule: "0 0 1 * *"  # First day of month
+  schedule: "0 0 1 * *" # First day of month
   resourceRef:
     apiVersion: database.example.com/v1
     kind: Database
@@ -160,16 +160,16 @@ Conditions can reference any status field:
 triggers:
   # Resource unhealthy
   - when: status.phase == "Unhealthy"
-    
+
   # CPU too high
   - when: status.metrics.cpu.percentage > 80
-    
+
   # Disk filling up
   - when: status.storage.used / status.storage.total > 0.9
-    
+
   # Any condition
   - when: status.conditions[Ready] == False
-    
+
   # Multiple conditions
   - when: status.phase == "Degraded" && status.replicasAvailable < 2
 ```
@@ -213,7 +213,7 @@ spec:
         type: ScaleUp
         parameters:
           newInstanceType: "larger-tier"
-          stopOldInstance: false  # Keep for fallback
+          stopOldInstance: false # Keep for fallback
 ```
 
 #### Cascading Updates
@@ -233,7 +233,7 @@ spec:
       operation:
         type: UpdateDependents
         parameters:
-          updatePolicies: [ ]
+          updatePolicies: []
           restartServices: true
 ```
 
@@ -303,9 +303,9 @@ Control how operations retry:
 operation:
   type: RestartDatabase
   backoff:
-    initialDelay: 10s      # First retry after 10s
-    maxDelay: 5m           # Max wait between retries
-    backoffMultiplier: 2   # Double each time (10s, 20s, 40s...)
+    initialDelay: 10s # First retry after 10s
+    maxDelay: 5m # Max wait between retries
+    backoffMultiplier: 2 # Double each time (10s, 20s, 40s...)
   maxRetries: 5
 ```
 
@@ -437,7 +437,7 @@ triggers:
     operation:
       maxRetries: 3
       backoff:
-        maxDelay: 10m  # Don't retry too frequently
+        maxDelay: 10m # Don't retry too frequently
 ```
 
 ### 5. Document Operation Intentions

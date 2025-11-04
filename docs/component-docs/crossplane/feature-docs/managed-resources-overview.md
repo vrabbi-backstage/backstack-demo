@@ -11,6 +11,7 @@ Managed Resources (MRs) are the foundation of Crossplane's infrastructure abstra
 Managed Resources are Kubernetes representations of cloud resources. Each Crossplane provider publishes Managed Resource types for resources it supports.
 
 **Examples**:
+
 - AWS: `Instance`, `DBInstance`, `SecurityGroup`, `S3Bucket`, `LoadBalancer`
 - Azure: `ResourceGroup`, `VirtualMachine`, `SQLServer`, `StorageAccount`
 - GCP: `Instance`, `CloudSQLInstance`, `StorageBucket`, `ServiceAccount`
@@ -18,11 +19,13 @@ Managed Resources are Kubernetes representations of cloud resources. Each Crossp
 ## Why Use Managed Resources?
 
 ### Traditional Cloud Management
+
 ```
 Write code → Call cloud SDK → Handle errors → Parse responses → Update app state
 ```
 
 ### With Crossplane Managed Resources
+
 ```
 Write YAML → Create resource → Kubernetes reconciles → Status is always current
 ```
@@ -56,6 +59,7 @@ spec:
 ```
 
 **Key sections**:
+
 - `apiVersion` - Provider-specific resource API
 - `spec.forProvider` - Cloud-provider specific configuration
 - `spec.providerConfigRef` - Credentials and configuration for this provider
@@ -79,6 +83,7 @@ status:
 ```
 
 **Key fields**:
+
 - `conditions` - Resource health and status
 - `atProvider` - Actual cloud resource properties
 - `observedGeneration` - Last reconciliation generation
@@ -95,7 +100,6 @@ Create → Provider controller watches → Calls cloud API → Cloud resource cr
 
 ```yaml
 kubectl apply -f instance.yaml
-
 # Status becomes:
 # status.conditions[Ready] = False (Creating)
 # (waiting for actual cloud resource)
@@ -133,7 +137,7 @@ spec.forProvider.tags:
 Crossplane continuously monitors cloud resources:
 
 ```
-Poll cloud API → Compare actual state vs desired state → 
+Poll cloud API → Compare actual state vs desired state →
   If different: patch resources → Report through status
 ```
 
@@ -175,6 +179,7 @@ spec:
 ```
 
 Multiple configurations support:
+
 - Different cloud accounts
 - Different regions as defaults
 - Different credential types (IAM role, credentials, OIDC)
@@ -202,10 +207,11 @@ metadata:
 spec:
   forProvider:
     region: us-east-1
-    vpcId: ${my-vpc.status.atProvider.vpcId}  # Reference other resource
+    vpcId: ${my-vpc.status.atProvider.vpcId} # Reference other resource
 ```
 
 Crossplane automatically:
+
 - Determines creation order (VPC first, then subnet)
 - Waits for dependencies to be ready
 - Updates references with actual resource IDs
@@ -285,7 +291,7 @@ kind: VPC
 metadata:
   name: existing-vpc
 spec:
-  managementPolicy: Observe  # Just watch, don't create
+  managementPolicy: Observe # Just watch, don't create
   forProvider:
     vpcId: vpc-12345
 ```
@@ -340,7 +346,7 @@ status.conditions:
     status: "True"
     reason: "Available"
     message: "Resource is ready"
-    
+
   - type: Synced
     status: "True"
     reason: "ReconcileSuccess"

@@ -82,6 +82,7 @@ spec:
 ```
 
 Crossplane's composition automatically:
+
 - Validates the input
 - Executes the composition pipeline
 - Creates all necessary cloud resources
@@ -116,7 +117,7 @@ Step 2: Default function adds defaults
 Step 3: Provisioning function creates resources
         → Reads tier and maps to instance type
         → Creates security groups, storage, networking
-        
+
 Output: App composite resource with all managed resources created
 ```
 
@@ -135,6 +136,7 @@ spec:
 ```
 
 Your composition handles:
+
 - Provider-specific configuration
 - Networking setup
 - Security policies
@@ -147,10 +149,11 @@ Build infrastructure across clouds:
 ```yaml
 kind: WebApplication
 spec:
-  cloudPreference: auto  # Composition chooses optimal cloud
+  cloudPreference: auto # Composition chooses optimal cloud
 ```
 
 Your composition can:
+
 - Evaluate costs across clouds
 - Check regional availability
 - Select based on compliance requirements
@@ -169,6 +172,7 @@ spec:
 ```
 
 Your composition:
+
 - Sizes infrastructure based on users
 - Configures data retention policies
 - Optimizes for budget constraints

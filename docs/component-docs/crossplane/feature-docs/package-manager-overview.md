@@ -28,6 +28,7 @@ Configuration packages bundle infrastructure definitions:
 - **Documentation** - API guides and examples
 
 **Use cases**:
+
 - Publish database API to internal registry
 - Share Kubernetes cluster provisioning configuration
 - Distribute microservice infrastructure templates
@@ -41,6 +42,7 @@ Function packages distribute composition functions:
 - **Templating functions** - Declarative transformations
 
 **Use cases**:
+
 - Share company-specific validation logic
 - Distribute cost optimization functions
 - Share multi-cloud routing functions
@@ -178,11 +180,11 @@ metaspec:
   version: v1.0.0
   license: Apache-2.0
   readme: README.md
-  
+
   # Dependencies
   dependsOn:
     - provider: xpkg.upbound.io/upbound/provider-aws:v0.33.0
-    
+
   # Keywords for discovery
   keywords:
     - aws
@@ -237,15 +239,15 @@ spec:
   dependsOn:
     # Exact version
     - provider: provider-aws:v0.33.0
-    
+
     # Minimum version
     - provider: provider-aws:>=v0.33.0
-    
+
     # Version range
     - provider: provider-aws:>=v0.33.0,<v1.0.0
-    
+
     # Latest compatible
-    - provider: provider-aws:~v0.33.0  # Allows v0.33.1, v0.33.2, etc.
+    - provider: provider-aws:~v0.33.0 # Allows v0.33.1, v0.33.2, etc.
 ```
 
 ## Package Lifecycle

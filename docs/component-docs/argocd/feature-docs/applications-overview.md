@@ -9,6 +9,7 @@ An **Application** is the fundamental unit of deployment in Argo CD. It represen
 ## What is an Application?
 
 An Application is a Kubernetes custom resource that defines:
+
 - Where application manifests are stored (Git repository)
 - How to generate those manifests (Helm, Kustomize, plain YAML, etc.)
 - Where to deploy them (target cluster and namespace)
@@ -28,16 +29,16 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  
+
   source:
     repoURL: https://github.com/mycompany/apps.git
     targetRevision: main
     path: apps/my-app
-  
+
   destination:
     server: https://kubernetes.default.svc
     namespace: default
-  
+
   syncPolicy:
     automated:
       prune: true
@@ -59,6 +60,7 @@ argocd app create my-app \
 ### Using the Web UI
 
 Create through the Argo CD web interface:
+
 1. Click "Create Application"
 2. Enter application name
 3. Select project
@@ -77,26 +79,26 @@ Specify where application manifests come from:
 source:
   # Git repository URL
   repoURL: https://github.com/mycompany/apps.git
-  
+
   # Which branch/tag/commit to track
   targetRevision: main
-  
+
   # Path within repository
   path: apps/my-app
-  
+
   # For Helm charts
-  chart: my-chart         # If deploying Helm from repo
+  chart: my-chart # If deploying Helm from repo
   helm:
     releaseName: my-app
     values: |
       replicas: 3
       image: myapp:v1.0.0
-    
+
   # For Kustomize
   kustomize:
     namePrefix: prod-
     nameSuffix: -prod
-    
+
   # For Jsonnet
   jsonnet:
     vars:
@@ -113,10 +115,10 @@ destination:
   server: https://kubernetes.default.svc
   # OR remote cluster
   name: production
-  
+
   # Target namespace
   namespace: production
-  
+
   # Create namespace if missing
   syncPolicy:
     syncOptions:
@@ -128,7 +130,7 @@ destination:
 Associate with a project for access control:
 
 ```yaml
-project: platform-team  # Which project this app belongs to
+project: platform-team # Which project this app belongs to
 ```
 
 ## Synchronization
@@ -170,11 +172,12 @@ Enable automatic synchronization:
 ```yaml
 syncPolicy:
   automated:
-    prune: true      # Delete removed resources
-    selfHeal: true   # Sync on drift
+    prune: true # Delete removed resources
+    selfHeal: true # Sync on drift
 ```
 
 **What happens with automated sync**:
+
 - When Git changes detected → automatically apply changes
 - When cluster drifts → automatically reconcile to Git state
 - Resources deleted from cluster → automatically recreate
@@ -187,11 +190,11 @@ Configure retry behavior if sync fails:
 ```yaml
 syncPolicy:
   retry:
-    limit: 5           # Max retry attempts
+    limit: 5 # Max retry attempts
     backoff:
-      duration: 5s     # Initial delay
-      factor: 2        # Multiply delay by factor each retry
-      maxDuration: 3m  # Max delay between retries
+      duration: 5s # Initial delay
+      factor: 2 # Multiply delay by factor each retry
+      maxDuration: 3m # Max delay between retries
 ```
 
 ## Application Status
@@ -201,12 +204,15 @@ syncPolicy:
 Applications track two independent status dimensions:
 
 **Sync Status** - Does live state match Git?
+
 - Synced / OutOfSync / Unknown
 
 **Health Status** - Are resources functioning?
+
 - Healthy / Progressing / Degraded / Unknown
 
 An application can be:
+
 - **Synced & Healthy** ✅ - Perfect state
 - **Synced but Degraded** - In Git but resources unhealthy
 - **OutOfSync & Healthy** - Not deployed yet or manual changes
@@ -280,7 +286,7 @@ sources:
   - repoURL: https://github.com/company/base.git
     path: base/
     targetRevision: main
-  
+
   # Environment-specific
   - repoURL: https://github.com/company/envs.git
     path: prod/
@@ -323,21 +329,21 @@ kind: ConfigMap
 metadata:
   name: config
   annotations:
-    argocd.argoproj.io/sync-wave: "0"  # Deploy first
+    argocd.argoproj.io/sync-wave: "0" # Deploy first
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: app
   annotations:
-    argocd.argoproj.io/sync-wave: "1"  # Deploy second
+    argocd.argoproj.io/sync-wave: "1" # Deploy second
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: post-deploy
   annotations:
-    argocd.argoproj.io/sync-wave: "2"  # Deploy third
+    argocd.argoproj.io/sync-wave: "2" # Deploy third
 ```
 
 ### Ignore Differences

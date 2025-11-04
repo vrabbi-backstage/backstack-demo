@@ -11,12 +11,14 @@ Before writing and deploying Kyverno policies, it's important to understand the 
 A **Policy** is a Kubernetes custom resource that defines rules for validating, mutating, or generating resources.
 
 **Characteristics**:
+
 - **Declarative** - Defined in YAML, stored in Git
 - **Reusable** - Can be applied to many resources
 - **Versioned** - Policy changes tracked in Git history
 - **Enforceable** - Applied automatically to all matching resources
 
 Policies have two scope options:
+
 - **Policy** - Namespace-scoped, applies within a namespace
 - **ClusterPolicy** - Cluster-scoped, applies to all namespaces
 
@@ -25,6 +27,7 @@ Policies have two scope options:
 A **Rule** is a single policy guideline within a Policy resource.
 
 **Key components**:
+
 - **Name** - Identifier for the rule
 - **Match** - Conditions for which resources the rule applies
 - **Type** - What action the rule performs (validate, mutate, generate, verify)
@@ -39,11 +42,11 @@ metadata:
   name: security-policies
 spec:
   rules:
-    - name: require-labels        # Rule 1
+    - name: require-labels # Rule 1
       match: ...
       validate: ...
-    
-    - name: add-network-policy    # Rule 2
+
+    - name: add-network-policy # Rule 2
       match: ...
       generate: ...
 ```
@@ -59,23 +62,23 @@ Resources are selected using:
 ```yaml
 match:
   resources:
-    kinds:                    # Kubernetes resource types
+    kinds: # Kubernetes resource types
       - Pod
       - Deployment
-    namespaces:              # Namespaces
+    namespaces: # Namespaces
       - production
       - staging
-    names:                   # Resource names (wildcards)
+    names: # Resource names (wildcards)
       - app-*
-    selector:                # Label selectors
+    selector: # Label selectors
       matchLabels:
         app: critical
-    annotations:             # Annotation matching
+    annotations: # Annotation matching
       team: platform
-  operations:                # Admission operations
+  operations: # Admission operations
     - CREATE
     - UPDATE
-  subjects:                  # Service accounts
+  subjects: # Service accounts
     - name: deployer
 ```
 
@@ -95,6 +98,7 @@ exclude:
 ```
 
 Logical operators:
+
 - **any** - Match if any condition is true (OR)
 - **all** - Match if all conditions are true (AND)
 
@@ -111,6 +115,7 @@ preconditions:
 ```
 
 Common operators:
+
 - **Equals** - Exact match
 - **NotEquals** - Inverse match
 - **In** - Value in list
@@ -134,11 +139,12 @@ validate:
       containers:
         - resources:
             requests:
-              memory: "?*"      # Must have memory request
-              cpu: "?*"         # Must have cpu request
+              memory: "?*" # Must have memory request
+              cpu: "?*" # Must have cpu request
 ```
 
 Pattern operators:
+
 - `?*` - Optional (must be present if specified)
 - `?` - Optional value
 - `*` - Any value
@@ -150,12 +156,13 @@ Anchors modify pattern matching behavior:
 
 ```yaml
 spec:
-  =(hostNetwork): "false"       # Disallow hostNetwork=true
-  =(containers):                # Exactly these fields
+  =(hostNetwork): "false" # Disallow hostNetwork=true
+  =(containers): # Exactly these fields
     - name: "*"
 ```
 
 Anchor types:
+
 - `=` - Equality anchor (exact match)
 - `^` - Negation anchor (must not match)
 - `>` - Wild card anchor (at least one)
@@ -210,6 +217,7 @@ mutate:
 ```
 
 JSON Patch operations:
+
 - **add** - Add a value
 - **remove** - Remove a value
 - **replace** - Change a value
@@ -237,6 +245,7 @@ generate:
 ### Generation Triggers
 
 Rules trigger on:
+
 - **Namespace creation** - Generate resources in new namespaces
 - **Deployment creation** - Generate associated resources
 - **Custom triggers** - Any resource kind
@@ -244,6 +253,7 @@ Rules trigger on:
 ### Generation Synchronization
 
 Generated resources can be:
+
 - **Synchronized** - Kept in sync with policy updates
 - **Independent** - Not updated after generation
 
@@ -252,6 +262,7 @@ Generated resources can be:
 **Failure Action** determines what happens when a validation rule fails.
 
 ### Enforce
+
 Resource creation is blocked:
 
 ```yaml
@@ -263,6 +274,7 @@ validationFailureAction: enforce
 - ⏹️ No policy report entry (blocked before creation)
 
 ### Audit
+
 Resource is allowed, violation is reported:
 
 ```yaml
@@ -293,11 +305,11 @@ metadata:
 results:
   - policy: require-labels
     rule: check-labels
-    result: fail              # pass, fail, skip, warn, error
+    result: fail # pass, fail, skip, warn, error
     message: "label required"
     severity: medium
     category: "Security"
-    scored: true             # Affects policy score
+    scored: true # Affects policy score
 summary:
   pass: 10
   fail: 2
@@ -307,6 +319,7 @@ summary:
 ```
 
 Result types:
+
 - **pass** - Resource complies with rule
 - **fail** - Resource violates rule
 - **skip** - Rule not evaluated (precondition failed)
@@ -337,6 +350,7 @@ spec:
 ```
 
 Exception components:
+
 - **policyName** - Which policy to except
 - **ruleNames** - Which rules to except
 - **match** - Which resources are excepted
@@ -404,6 +418,7 @@ pattern:
 ```
 
 Operators:
+
 - **Equals / NotEquals** - Exact match
 - **In / NotIn** - Value in set
 - **GreaterThan / LessThan** - Numeric comparison
@@ -415,6 +430,7 @@ Operators:
 **Severity** indicates the importance of a policy violation.
 
 Levels:
+
 - **critical** - Security or compliance critical
 - **high** - Significant issues
 - **medium** - Important but not critical
@@ -425,7 +441,7 @@ Levels:
 rules:
   - name: critical-security
     severity: critical
-  
+
   - name: best-practice
     severity: low
 ```
@@ -438,12 +454,13 @@ rules:
 rules:
   - name: pod-security
     category: "Pod Security Standards"
-  
+
   - name: image-security
     category: "Image Security"
 ```
 
 Common categories:
+
 - Pod Security Standards
 - Image Security
 - Resource Management
@@ -460,7 +477,7 @@ rules:
     match:
       resources:
         kinds:
-          - Deployment    # Rule written for Deployment
+          - Deployment # Rule written for Deployment
           - StatefulSet
     validate: ...
     # Kyverno auto-generates rules for:
@@ -474,21 +491,21 @@ Auto-generated rules are prefixed with `autogen-`.
 
 Core concepts work together:
 
-| Concept | Purpose |
-|---------|---------|
-| **Policy** | Container for rules |
-| **Rule** | Single policy guideline |
-| **Match** | Which resources the rule applies to |
-| **Precondition** | Pre-flight checks before evaluation |
-| **Validate** | Check resource matches pattern |
-| **Mutate** | Modify resource |
-| **Generate** | Create resources |
-| **Verify** | Check signatures |
-| **Failure Action** | What happens on violation |
-| **Report** | Records of policy evaluation |
-| **Exception** | Override for specific resources |
-| **Context** | External data for evaluation |
-| **Condition** | Expression evaluation |
+| Concept            | Purpose                             |
+| ------------------ | ----------------------------------- |
+| **Policy**         | Container for rules                 |
+| **Rule**           | Single policy guideline             |
+| **Match**          | Which resources the rule applies to |
+| **Precondition**   | Pre-flight checks before evaluation |
+| **Validate**       | Check resource matches pattern      |
+| **Mutate**         | Modify resource                     |
+| **Generate**       | Create resources                    |
+| **Verify**         | Check signatures                    |
+| **Failure Action** | What happens on violation           |
+| **Report**         | Records of policy evaluation        |
+| **Exception**      | Override for specific resources     |
+| **Context**        | External data for evaluation        |
+| **Condition**      | Expression evaluation               |
 
 ## See Also
 

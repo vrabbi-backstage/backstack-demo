@@ -15,24 +15,27 @@ Argo CD automatically deploys changes when Git is updated:
 ```yaml
 syncPolicy:
   automated:
-    prune: true        # Delete removed resources
-    selfHeal: true     # Sync on drift detection
-    allowEmpty: false  # Reject empty manifests
+    prune: true # Delete removed resources
+    selfHeal: true # Sync on drift detection
+    allowEmpty: false # Reject empty manifests
 ```
 
 **When to use**:
+
 - Development/testing environments
 - Teams with high trust and low risk
 - Fast-moving projects
 - Non-critical applications
 
 **Advantages**:
+
 - ✅ Latest changes always deployed
 - ✅ No manual intervention needed
 - ✅ Automatic drift correction
 - ✅ Fast deployment pipeline
 
 **Disadvantages**:
+
 - ❌ Bugs deployed automatically
 - ❌ No approval gate
 - ❌ Difficult to control in production
@@ -50,18 +53,21 @@ argocd app sync my-app
 ```
 
 **When to use**:
+
 - Production environments
 - High-risk deployments
 - Regulated industries
 - Blue-team/change control processes
 
 **Advantages**:
+
 - ✅ Full control over deployments
 - ✅ Approval gates possible
 - ✅ Prevents accidental deployments
 - ✅ Production-safe
 
 **Disadvantages**:
+
 - ❌ Manual overhead
 - ❌ Delayed deployments
 - ❌ Can lag behind Git
@@ -86,7 +92,7 @@ kind: Application
 metadata:
   name: my-app-prod
 spec:
-  syncPolicy: {}  # Manual sync only
+  syncPolicy: {} # Manual sync only
 ```
 
 ## Deployment Patterns
@@ -105,10 +111,10 @@ spec:
     - list:
         elements:
           - color: blue
-            weight: 100     # All traffic to blue
+            weight: 100 # All traffic to blue
           - color: green
-            weight: 0       # No traffic to green
-  
+            weight: 0 # No traffic to green
+
   template:
     metadata:
       name: "my-app-{{ color }}"
@@ -127,18 +133,21 @@ spec:
 ```
 
 **Deployment process**:
+
 1. Deploy new version to green environment
 2. Test green environment (all traffic on blue)
 3. Switch traffic from blue to green
 4. Keep blue as fallback
 
 **Advantages**:
+
 - ✅ Zero-downtime deployments
 - ✅ Easy rollback (switch back to blue)
 - ✅ Full testing before traffic switch
 - ✅ Minimal traffic loss
 
 **Disadvantages**:
+
 - ❌ Double infrastructure cost
 - ❌ Database migration complexity
 - ❌ Storage usage doubled
@@ -163,8 +172,8 @@ spec:
   analysis:
     interval: 1m
     threshold: 5
-    maxWeight: 50        # Max traffic to canary
-    stepWeight: 5        # Traffic increase per step
+    maxWeight: 50 # Max traffic to canary
+    stepWeight: 5 # Traffic increase per step
     metrics:
       - name: request-success-rate
         thresholdRange:
@@ -177,6 +186,7 @@ spec:
 ```
 
 **Deployment process**:
+
 1. Deploy new version alongside old
 2. Route small percentage to new version (5%)
 3. Monitor metrics (error rate, latency)
@@ -184,12 +194,14 @@ spec:
 5. Roll back if metrics degrade
 
 **Advantages**:
+
 - ✅ Early detection of issues
 - ✅ Gradual rollout reduces risk
 - ✅ Automatic rollback on errors
 - ✅ Real-world testing with real traffic
 
 **Disadvantages**:
+
 - ❌ Complex setup and monitoring
 - ❌ Longer deployment time
 - ❌ Requires good metrics/alerts
@@ -209,8 +221,8 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 1        # One extra pod during update
-      maxUnavailable: 0  # Zero pods unavailable
+      maxSurge: 1 # One extra pod during update
+      maxUnavailable: 0 # Zero pods unavailable
   template:
     spec:
       containers:
@@ -219,18 +231,21 @@ spec:
 ```
 
 **Deployment process**:
+
 1. Start new pod with new version
 2. Wait for readiness
 3. Remove old pod
 4. Repeat for each pod
 
 **Advantages**:
+
 - ✅ Simple, Kubernetes native
 - ✅ Zero-downtime deployment
 - ✅ Easy rollback
 - ✅ No extra infrastructure
 
 **Disadvantages**:
+
 - ❌ Multiple versions running simultaneously
 - ❌ Database compatibility required
 - ❌ Limited control over rollout speed
@@ -242,20 +257,23 @@ Stop all pods, then start new version:
 ```yaml
 spec:
   strategy:
-    type: Recreate  # Stop all, then start new
+    type: Recreate # Stop all, then start new
 ```
 
 **Deployment process**:
+
 1. Stop all running pods
 2. Wait for graceful shutdown
 3. Start new pods with new version
 
 **Advantages**:
+
 - ✅ Simple, fast
 - ✅ Only one version running
 - ✅ No version compatibility issues
 
 **Disadvantages**:
+
 - ❌ Downtime during deployment
 - ❌ No traffic during update
 - ❌ Not suitable for high-availability
@@ -277,6 +295,7 @@ argocd app sync my-app \
 ```
 
 **Use cases**:
+
 - Configuration-only changes
 - Urgent hotfixes
 - Testing partial deployments
@@ -315,24 +334,25 @@ kind: ConfigMap
 metadata:
   name: config
   annotations:
-    argocd.argoproj.io/sync-wave: "0"  # Deploy first
+    argocd.argoproj.io/sync-wave: "0" # Deploy first
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: app
   annotations:
-    argocd.argoproj.io/sync-wave: "1"  # Deploy second
+    argocd.argoproj.io/sync-wave: "1" # Deploy second
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: post-deploy
   annotations:
-    argocd.argoproj.io/sync-wave: "2"  # Deploy third (post-sync hook)
+    argocd.argoproj.io/sync-wave: "2" # Deploy third (post-sync hook)
 ```
 
 **Use cases**:
+
 - Database migrations before app deployment
 - Configuration setup before services
 - Health checks after deployment
@@ -362,6 +382,7 @@ spec:
 ```
 
 **Hook types**:
+
 - **PreSync** - Before resources applied (e.g., backup)
 - **Sync** - During application (e.g., waiting)
 - **PostSync** - After resources applied (e.g., tests)
@@ -383,7 +404,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: my-app
-  
+
   # Argo CD watches this metric
   analysis:
     metrics:
@@ -474,19 +495,19 @@ metadata:
 spec:
   source:
     targetRevision: main
-  syncPolicy: {}  # Manual sync only
+  syncPolicy: {} # Manual sync only
 ```
 
 ## Choosing a Strategy
 
-| Strategy | Best For | Risk | Complexity |
-|----------|----------|------|------------|
-| **Automated** | Development/testing | High | Low |
-| **Manual** | Production/regulated | Low | Low |
-| **Rolling** | High-availability apps | Medium | Low |
-| **Blue-green** | Zero-downtime critical | Low | Medium |
-| **Canary** | High-risk deployments | Very Low | High |
-| **Recreate** | Non-critical apps | High | Low |
+| Strategy       | Best For               | Risk     | Complexity |
+| -------------- | ---------------------- | -------- | ---------- |
+| **Automated**  | Development/testing    | High     | Low        |
+| **Manual**     | Production/regulated   | Low      | Low        |
+| **Rolling**    | High-availability apps | Medium   | Low        |
+| **Blue-green** | Zero-downtime critical | Low      | Medium     |
+| **Canary**     | High-risk deployments  | Very Low | High       |
+| **Recreate**   | Non-critical apps      | High     | Low        |
 
 ## Best Practices
 

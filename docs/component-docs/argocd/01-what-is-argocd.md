@@ -13,6 +13,7 @@ Argo CD automates the deployment of applications to specified target Kubernetes 
 GitOps is an operational framework that takes DevOps best practices used for application development—such as version control, code review, and CI/CD—and applies them to infrastructure automation and application deployment.
 
 With GitOps:
+
 - **Git is the source of truth** - All desired state is stored in Git
 - **Everything is declarative** - Infrastructure and applications defined in version-controlled manifests
 - **Changes are auditable** - Every change goes through Git history and code review
@@ -109,21 +110,25 @@ Argo CD supports various deployment strategies:
 ## Who Uses Argo CD?
 
 ### Platform Engineers
+
 - Standardize deployment processes across teams
 - Implement self-service application deployment
 - Enforce organizational policies and security
 
 ### DevOps/SRE Teams
+
 - Automate and audit application deployments
 - Manage multi-cluster applications
 - Implement disaster recovery and GitOps workflows
 
 ### Application Teams
+
 - Deploy applications with single Git push
 - Access deployment history and status in real-time
 - Easy rollback and application management
 
 ### Organizations
+
 - Single source of truth for application state
 - Complete audit trail of all changes
 - Reduced deployment errors and increased reliability

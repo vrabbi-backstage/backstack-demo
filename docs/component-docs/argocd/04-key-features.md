@@ -32,7 +32,7 @@ spec:
     repoURL: https://github.com/mycompany/apps.git
     path: apps/my-app
     targetRevision: main
-    
+
     # Helm configuration
     helm:
       releaseName: my-app
@@ -105,7 +105,7 @@ spec:
     - repoURL: https://github.com/company/base.git
       path: base/
       targetRevision: main
-    
+
     # Environment-specific overrides
     - repoURL: https://github.com/company/environments.git
       path: prod/
@@ -149,7 +149,7 @@ spec:
             namespace: backend
           - app: database
             namespace: data
-  
+
   # Template applied for each generated application
   template:
     metadata:
@@ -195,7 +195,7 @@ generators:
       repoURL: https://github.com/company/apps.git
       revision: main
       directories:
-        - path: 'apps/*'  # Match app directories
+        - path: "apps/*" # Match app directories
 ```
 
 #### 3. SCM Provider Generator
@@ -243,6 +243,7 @@ generators:
 ### Use Cases
 
 **Multi-cluster deployments**:
+
 ```yaml
 # Generate Application for each cluster
 generators:
@@ -253,17 +254,18 @@ generators:
 template:
   spec:
     destination:
-      server: "{{ url }}"  # Cluster URL from label
+      server: "{{ url }}" # Cluster URL from label
 ```
 
 **Multi-tenant SaaS**:
+
 ```yaml
 # Generate Application for each tenant
 generators:
   - git:
       repoURL: https://github.com/company/tenants.git
       directories:
-        - path: 'tenants/*'
+        - path: "tenants/*"
 template:
   spec:
     destination:
@@ -271,6 +273,7 @@ template:
 ```
 
 **Environment promotion**:
+
 ```yaml
 # Generate Application for each environment
 generators:
@@ -347,16 +350,16 @@ Control how and when synchronization happens:
 syncPolicy:
   # Automated sync
   automated:
-    prune: true        # Delete resources removed from Git
-    selfHeal: true     # Sync when live state drifts
-    allowEmpty: false  # Reject empty manifests
-  
+    prune: true # Delete resources removed from Git
+    selfHeal: true # Sync when live state drifts
+    allowEmpty: false # Reject empty manifests
+
   # Manual sync settings
   syncOptions:
-    - CreateNamespace=true          # Create namespace if missing
-    - PrunePropagationPolicy=foreground  # How to delete resources
-    - RespectIgnoreDifferences=true  # Ignore specified differences
-  
+    - CreateNamespace=true # Create namespace if missing
+    - PrunePropagationPolicy=foreground # How to delete resources
+    - RespectIgnoreDifferences=true # Ignore specified differences
+
   # Retry configuration
   retry:
     limit: 5
@@ -380,11 +383,13 @@ syncPolicy:
 ```
 
 **Advantages**:
+
 - Latest changes always deployed
 - No manual approval needed
 - Great for development/staging
 
 **Disadvantages**:
+
 - No approval gate
 - Can deploy errors
 - Less control in production
@@ -402,11 +407,13 @@ argocd app sync my-app
 ```
 
 **Advantages**:
+
 - Full control over deployments
 - Approval gates possible
 - Production-safe
 
 **Disadvantages**:
+
 - Requires manual intervention
 - Can lag behind Git
 
@@ -418,7 +425,7 @@ Deploy resources gradually:
 syncPolicy:
   syncOptions:
     - RespectIgnoreDifferences=true
-    
+
 # Only sync selected resources
 argocd app sync my-app --resource=Deployment/my-app
 ```
@@ -433,21 +440,21 @@ kind: Service
 metadata:
   name: my-service
   annotations:
-    argocd.argoproj.io/sync-wave: "0"  # Deploy first
+    argocd.argoproj.io/sync-wave: "0" # Deploy first
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: my-app
   annotations:
-    argocd.argoproj.io/sync-wave: "1"  # Deploy second
+    argocd.argoproj.io/sync-wave: "1" # Deploy second
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: post-deploy-job
   annotations:
-    argocd.argoproj.io/sync-wave: "2"  # Deploy third
+    argocd.argoproj.io/sync-wave: "2" # Deploy third
 ```
 
 ### Sync Hooks
@@ -461,13 +468,13 @@ syncPolicy:
     - rbac: "*"
       kind: Job
       name: pre-sync-job
-  
+
   # Sync hook - runs during resource sync
   Sync:
     - rbac: "*"
       kind: Pod
       name: sync-pod
-  
+
   # PostSync hook - runs after resources applied
   PostSync:
     - rbac: "*"
@@ -489,16 +496,16 @@ metadata:
 spec:
   # Which source repos team can deploy from
   sourceRepos:
-    - 'https://github.com/mycompany/frontend-*'
-  
+    - "https://github.com/mycompany/frontend-*"
+
   # Which clusters/namespaces they can deploy to
   destinations:
-    - namespace: 'frontend-*'
-      server: '*'
-  
+    - namespace: "frontend-*"
+      server: "*"
+
   # What resources they can manage
   clusterResourceWhitelist:
-    - group: ''
+    - group: ""
       kind: Namespace
 ```
 
@@ -512,7 +519,7 @@ policy.csv: |
   p, role:frontend-team, applications, get, frontend-team/*, allow
   p, role:frontend-team, applications, sync, frontend-team/*, allow
   p, role:frontend-team, repositories, get, https://github.com/mycompany/frontend-*, allow
-  
+
   # Grant role to user
   g, user@example.com, role:frontend-team
 ```
@@ -621,7 +628,7 @@ generators:
 template:
   spec:
     destination:
-      server: "{{ url }}"  # Cluster URL
+      server: "{{ url }}" # Cluster URL
       namespace: "{{ metadata.namespace }}"
 ```
 

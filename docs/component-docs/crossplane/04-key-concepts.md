@@ -21,6 +21,7 @@ User creates XR → Function 1 (transform) → Function 2 (add defaults) → ...
 ```
 
 **Key capabilities**:
+
 - **Multi-language support** - Go, Python, or template-based
 - **Reusable** - Package and share functions across teams
 - **Composable** - Chain multiple functions together
@@ -34,7 +35,7 @@ Patching allows you to map values from a Composite Resource to Managed Resources
 patches:
   - fromFieldPath: spec.region
     toFieldPath: spec.forProvider.region
-    
+
   - fromFieldPath: spec.size
     transforms:
       - type: map
@@ -61,6 +62,7 @@ Compositions support conditional logic through policy engines:
 Managed Resources (MRs) are Kubernetes custom resources that represent cloud provider resources. Each Crossplane provider publishes their own set of MRs.
 
 Examples:
+
 - AWS provider: `Instance`, `DBInstance`, `SecurityGroup`, `Bucket`, etc.
 - Azure provider: `ResourceGroup`, `VirtualMachine`, `SQLServer`, etc.
 - GCP provider: `Instance`, `CloudSQLInstance`, `StorageBucket`, etc.
@@ -100,6 +102,7 @@ spec:
 ```
 
 Crossplane automatically:
+
 - Determines creation order based on dependencies
 - Waits for referenced resources to become ready
 - Updates references as resources are created
@@ -117,7 +120,7 @@ kind: CronOperation
 metadata:
   name: daily-backup
 spec:
-  schedule: "0 2 * * *"  # 2 AM daily
+  schedule: "0 2 * * *" # 2 AM daily
   resourceRef:
     apiVersion: database.example.com/v1
     kind: Database
@@ -129,6 +132,7 @@ spec:
 ```
 
 **Use cases**:
+
 - Scheduled backups of databases
 - Periodic scaling operations
 - Resource cleanup and maintenance
@@ -155,6 +159,7 @@ spec:
 ```
 
 **Use cases**:
+
 - Auto-remediation of unhealthy resources
 - Cascading updates based on dependency changes
 - Event-driven infrastructure automation
@@ -163,6 +168,7 @@ spec:
 ### Operation Targets
 
 Operations can target:
+
 - **Individual resources** - Specific composite or managed resource
 - **Resource sets** - Multiple resources matching a selector
 - **Composite resources** - All managed resources within a composite
@@ -176,12 +182,14 @@ Packages are distributions of Crossplane configurations, compositions, and funct
 ### Configuration Packages
 
 Configuration packages bundle together:
+
 - Composite Resource Definitions (XRDs)
 - Compositions
 - Documentation
 - Providers and their configurations
 
 Benefits:
+
 - **Reusability** - Share infrastructure APIs across teams and organizations
 - **Versioning** - Track changes and provide upgrade paths
 - **Dependency management** - Declare and resolve dependencies
@@ -199,6 +207,7 @@ Function packages contain composition functions:
 ### Package Distribution
 
 Packages can be distributed through:
+
 - **Package registries** - Central package repositories
 - **Git repositories** - Direct consumption from GitHub, GitLab
 - **Container registries** - Docker registries for function images
@@ -289,40 +298,45 @@ Composition detects:
 
 While templates are simpler, compositions are more powerful:
 
-| Aspect | Templates | Compositions |
-|--------|-----------|--------------|
-| Logic | Simple substitution | Complex functions |
-| Reusability | Limited | High (packaged functions) |
-| Validation | Manual | Built-in policy support |
-| Error handling | Manual | Automatic |
-| Testing | Difficult | Supported by framework |
-| Updates | Re-render all | Incremental patches |
+| Aspect         | Templates           | Compositions              |
+| -------------- | ------------------- | ------------------------- |
+| Logic          | Simple substitution | Complex functions         |
+| Reusability    | Limited             | High (packaged functions) |
+| Validation     | Manual              | Built-in policy support   |
+| Error handling | Manual              | Automatic                 |
+| Testing        | Difficult           | Supported by framework    |
+| Updates        | Re-render all       | Incremental patches       |
 
 Crossplane's composition functions are the recommended modern approach.
 
 ## Best Practices
 
 ### 1. **Composition Design**
+
 - Keep compositions focused on a single infrastructure abstraction
 - Use multiple functions for different concerns (validation, transformation, defaults)
 - Version compositions for backward compatibility
 
 ### 2. **Managed Resource Usage**
+
 - Understand provider-specific quirks and behaviors
 - Use provider configurations to manage credentials and defaults
 - Monitor for provider API changes
 
 ### 3. **Operations Management**
+
 - Use CronOperations for scheduled maintenance
 - Implement WatchOperations for critical resource monitoring
 - Log all operations for audit trails
 
 ### 4. **Package Management**
+
 - Version all packages semantically (MAJOR.MINOR.PATCH)
 - Document package capabilities and requirements
 - Test packages before publishing
 
 ### 5. **Multi-cloud Strategy**
+
 - Abstract provider differences in compositions
 - Use composition functions to implement cloud-specific logic
 - Plan for provider portability

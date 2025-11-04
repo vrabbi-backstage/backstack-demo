@@ -55,6 +55,7 @@ Argo CD follows a controller-based architecture with several key components that
 The API server is the central hub for Argo CD operations:
 
 **Responsibilities**:
+
 - Provides gRPC and REST APIs consumed by Web UI, CLI, and external systems
 - Manages Application resources (CRDs)
 - Handles user authentication and authorization
@@ -64,6 +65,7 @@ The API server is the central hub for Argo CD operations:
 - Provides access tokens for automation
 
 **Security features**:
+
 - OAuth2, OIDC, LDAP, SAML support
 - Fine-grained RBAC for application access
 - Session management and token generation
@@ -74,6 +76,7 @@ The API server is the central hub for Argo CD operations:
 The Repository Server handles Git repository interactions:
 
 **Responsibilities**:
+
 - Maintains a local cache of Git repositories
 - Generates Kubernetes manifests from various tools (Helm, Kustomize, Jsonnet)
 - Provides manifests to the Application Controller
@@ -81,6 +84,7 @@ The Repository Server handles Git repository interactions:
 - Supports custom config management plugins
 
 **Key operations**:
+
 - Clone and update Git repos
 - Cache manifest generation (performance optimization)
 - Template rendering (Helm, Kustomize, etc.)
@@ -91,6 +95,7 @@ The Repository Server handles Git repository interactions:
 The Application Controller is the core reconciliation engine:
 
 **Responsibilities**:
+
 - Continuously monitors running applications (watches Application CRDs)
 - Compares desired state (Git) with live state (cluster)
 - Detects out-of-sync applications
@@ -100,6 +105,7 @@ The Application Controller is the core reconciliation engine:
 - Manages application lifecycle
 
 **Key capabilities**:
+
 - State reconciliation
 - Automatic or manual sync triggering
 - Lifecycle hooks for custom logic
@@ -166,6 +172,7 @@ Argo CD assesses application health by:
 - Comparing to desired state
 
 Application states:
+
 - **Healthy** - All resources healthy and in-sync
 - **Progressing** - Deployment in progress
 - **Degraded** - Some resources unhealthy
@@ -176,11 +183,13 @@ Application states:
 Argo CD tracks two dimensions of status:
 
 ### Sync Status
+
 - **Synced** - Live state matches desired state
 - **OutOfSync** - Live state differs from desired state
 - **Unknown** - Cannot determine sync status
 
 ### Health Status
+
 - **Healthy** - Application resources are healthy
 - **Progressing** - Application is deploying/updating
 - **Degraded** - Application has unhealthy resources
@@ -211,18 +220,21 @@ For production deployments, Argo CD supports high availability:
 ## Integration Points
 
 ### Git Repositories
+
 - GitHub, GitLab, Gitea, Bitbucket
 - SSH and HTTPS authentication
 - Webhook support for push notifications
 - Branch, tag, and commit tracking
 
 ### Kubernetes Clusters
+
 - Local cluster (API server runs in)
 - External clusters (registered as secrets)
 - RBAC and service accounts
 - Namespace-scoped deployments
 
 ### External Systems
+
 - CI/CD pipelines (GitHub Actions, Jenkins, GitLab CI)
 - Secret management (Sealed Secrets, External Secrets)
 - Monitoring (Prometheus metrics exported)
@@ -234,6 +246,7 @@ For production deployments, Argo CD supports high availability:
 ### Resource Requirements
 
 Typical deployment needs:
+
 - API Server: 1 CPU, 512MB RAM
 - Repository Server: 0.5 CPU, 256MB RAM
 - Application Controller: 0.5 CPU, 256MB RAM
@@ -256,18 +269,21 @@ Typical deployment needs:
 ## State Management
 
 ### Desired State
+
 - Defined in Git repositories
 - Tracked by branch, tag, or commit
 - Stored as YAML manifests
 - Templated by Helm, Kustomize, etc.
 
 ### Actual State
+
 - Running Kubernetes resources
 - Monitored by Application Controller
 - Updated through kubectl apply
 - Reflected in resource status
 
 ### Reconciliation
+
 - Continuous comparison of states
 - Automatic or manual sync
 - Lifecycle hooks for custom logic

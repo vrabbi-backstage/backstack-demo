@@ -11,6 +11,7 @@ Before working with Argo CD, it's important to understand the core concepts and 
 An **Application** is the fundamental unit in Argo CD. It represents a group of Kubernetes resources defined by manifests in a Git repository.
 
 **Key characteristics**:
+
 - **Defined in Git** - Application source and configuration stored in version control
 - **Single logical unit** - Group of related resources treated as one deployable unit
 - **Custom Resource** - Implemented as Kubernetes CRD (CustomResourceDefinition)
@@ -18,6 +19,7 @@ An **Application** is the fundamental unit in Argo CD. It represents a group of 
 - **Trackable** - Can track Git branches, tags, or specific commits
 
 **Example**:
+
 ```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -40,6 +42,7 @@ spec:
 The **target state** is the desired state of an application as defined by manifests stored in a Git repository.
 
 **Characteristics**:
+
 - **Source of truth** - Git repository contains the canonical desired state
 - **Version controlled** - All changes tracked with Git history
 - **Declarative** - Expressed through Kubernetes manifests
@@ -47,6 +50,7 @@ The **target state** is the desired state of an application as defined by manife
 - **Reproducible** - Can deploy any historical state by checking out Git commit
 
 **Target state can be defined through**:
+
 - Helm charts
 - Kustomize overlays
 - Jsonnet files
@@ -58,6 +62,7 @@ The **target state** is the desired state of an application as defined by manife
 The **live state** is the actual current state of an application running in a Kubernetes cluster.
 
 **Characteristics**:
+
 - **Real-time** - Current running state of resources
 - **Observed** - Discovered by monitoring Kubernetes API
 - **Dynamic** - Changes when users manually update resources or deployments complete
@@ -69,12 +74,14 @@ The **live state** is the actual current state of an application running in a Ku
 **Sync status** describes whether the live state matches the target state.
 
 ### Synced
+
 - Live state matches target state
 - Application is in desired configuration
 - No manual changes outside of Git
 - Safe to deploy
 
 ### OutOfSync
+
 - Live state differs from target state
 - Could be due to:
   - Manual changes to Kubernetes resources (drift)
@@ -83,6 +90,7 @@ The **live state** is the actual current state of an application running in a Ku
   - Helm chart or template changes
 
 ### Unknown
+
 - Argo CD cannot determine sync status
 - Usually indicates:
   - Application not yet synced
@@ -94,6 +102,7 @@ The **live state** is the actual current state of an application running in a Ku
 **Sync** is the process of making the live state match the target state.
 
 **Sync process**:
+
 1. Generate manifests from Git (Helm, Kustomize, etc.)
 2. Compare generated manifests with live cluster state
 3. Identify differences
@@ -102,6 +111,7 @@ The **live state** is the actual current state of an application running in a Ku
 6. Update application status
 
 **Sync can be**:
+
 - **Automatic** - Argo CD automatically syncs when Git changes
 - **Manual** - Requires explicit approval/trigger
 - **Selective** - Sync only specific resources instead of entire application
@@ -112,6 +122,7 @@ The **live state** is the actual current state of an application running in a Ku
 **Refresh** is the process of comparing the latest Git commits with the live cluster state and updating the sync status.
 
 **Refresh operations**:
+
 - Fetch latest Git commit
 - Re-generate manifests
 - Compare with live state
@@ -119,6 +130,7 @@ The **live state** is the actual current state of an application running in a Ku
 - Detect drift from manual changes
 
 Refresh happens:
+
 - Automatically on a schedule (default 3 minutes)
 - When webhook received from Git
 - Manually via CLI: `argocd app refresh`
@@ -157,10 +169,10 @@ The **source** specifies where application manifests come from.
 
 ```yaml
 source:
-  repoURL: https://github.com/mycompany/apps.git  # Git repository
-  path: apps/my-app                               # Path in repository
-  targetRevision: main                            # Branch, tag, or commit
-  
+  repoURL: https://github.com/mycompany/apps.git # Git repository
+  path: apps/my-app # Path in repository
+  targetRevision: main # Branch, tag, or commit
+
   # If using Helm
   helm:
     valueFiles:
@@ -168,11 +180,11 @@ source:
     parameters:
       - name: replicas
         value: "3"
-  
+
   # If using Kustomize
   kustomize:
     namePrefix: prod-
-    
+
   # If using Jsonnet
   jsonnet:
     vars:
@@ -182,6 +194,7 @@ source:
 ### Target Revision Strategies
 
 Applications can track:
+
 - **Branch** - `targetRevision: main` - Always deploy latest from branch
 - **Tag** - `targetRevision: v1.2.3` - Pin to specific release
 - **Commit** - `targetRevision: abc1234` - Pin to specific commit
@@ -195,9 +208,9 @@ The **destination** specifies where an application should be deployed.
 
 ```yaml
 destination:
-  server: https://kubernetes.default.svc    # API server URL
-  namespace: production                      # Kubernetes namespace
-  name: production-cluster                   # Or cluster name
+  server: https://kubernetes.default.svc # API server URL
+  namespace: production # Kubernetes namespace
+  name: production-cluster # Or cluster name
 ```
 
 ### Multi-cluster Deployments
@@ -221,7 +234,7 @@ spec:
   template:
     spec:
       destination:
-        server: "{{ server }}"  # Populated by generator
+        server: "{{ server }}" # Populated by generator
         namespace: "{{ namespace }}"
 ```
 
@@ -230,12 +243,14 @@ spec:
 A **project** is a logical grouping of applications with associated access controls.
 
 **Project purposes**:
+
 - **Access control** - RBAC policies per project
 - **Organization** - Group related applications
 - **Policy enforcement** - Source repositories, destinations, resources allowed
 - **Multi-tenancy** - Separate applications by team
 
 **Example**:
+
 ```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
@@ -244,13 +259,13 @@ metadata:
 spec:
   description: Applications managed by platform team
   sourceRepos:
-    - 'https://github.com/mycompany/*'    # Allowed source repos
+    - "https://github.com/mycompany/*" # Allowed source repos
   destinations:
-    - namespace: 'platform-*'              # Allowed namespaces
-      server: '*'                          # Allowed servers
+    - namespace: "platform-*" # Allowed namespaces
+      server: "*" # Allowed servers
   clusterResourceWhitelist:
-    - group: '*'
-      kind: '*'                            # Allowed cluster-scoped resources
+    - group: "*"
+      kind: "*" # Allowed cluster-scoped resources
 ```
 
 ## Tool (Configuration Management Tool)
@@ -281,17 +296,19 @@ Argo CD automatically detects the tool based on files present:
 A **repository** is a Git repository containing application manifests.
 
 **Repository characteristics**:
+
 - **Source control** - All history tracked in Git
 - **Credentials** - Argo CD stores credentials to access private repos
 - **Caching** - Local cache maintained for performance
 - **Webhook support** - Can receive push notifications
 
 **Repository configuration**:
+
 ```yaml
 - url: https://github.com/mycompany/apps.git
-  password: <token>              # For HTTPS
-  sshPrivateKey: <key>          # For SSH
-  username: <username>           # For HTTPS
+  password: <token> # For HTTPS
+  sshPrivateKey: <key> # For SSH
+  username: <username> # For HTTPS
 ```
 
 ## Reconciliation
@@ -299,6 +316,7 @@ A **repository** is a Git repository containing application manifests.
 **Reconciliation** is Argo CD's continuous process of ensuring live state matches target state.
 
 **Reconciliation loop**:
+
 1. Watch for changes (Git commits, manual cluster changes)
 2. Fetch latest manifests from Git
 3. Generate manifests if templated
@@ -309,6 +327,7 @@ A **repository** is a Git repository containing application manifests.
 8. Repeat continuously
 
 **Reconciliation happens**:
+
 - Continuously in background (every ~5 seconds)
 - When Git changes detected (via webhook)
 - When manual sync triggered
@@ -325,6 +344,7 @@ A **repository** is a Git repository containing application manifests.
 - **PostSync** - Execute after resources applied (e.g., run tests, notify)
 
 **Example**:
+
 ```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -349,6 +369,7 @@ spec:
 An application is **OutOfSync** when live state differs from target state.
 
 **Common causes**:
+
 - New Git commits pushed but not yet deployed
 - Manual kubectl changes outside of Argo CD
 - Resource deleted from cluster manually
@@ -356,6 +377,7 @@ An application is **OutOfSync** when live state differs from target state.
 - Scaling changes not reflected in Git
 
 **Detection**:
+
 - Argo CD detects during refresh
 - Shown in UI and CLI as "OutOfSync"
 - Can trigger automatic sync if enabled
@@ -365,6 +387,7 @@ An application is **OutOfSync** when live state differs from target state.
 **Status** is the comprehensive state information for an application.
 
 **Status includes**:
+
 - **Sync status** - Synced, OutOfSync, Unknown
 - **Health** - Healthy, Progressing, Degraded, Unknown
 - **Resources** - Individual resource statuses
@@ -376,17 +399,17 @@ An application is **OutOfSync** when live state differs from target state.
 
 The Argo CD concepts form a cohesive model:
 
-| Concept | Purpose |
-|---------|---------|
-| Application | Unit of deployment and management |
-| Target State | Desired state in Git (source of truth) |
-| Live State | Actual running state in Kubernetes |
-| Sync Status | Whether target matches live |
-| Sync | Process of making target match live |
-| Health | Whether app is functioning correctly |
-| Source | Where manifests come from (Git) |
-| Destination | Where app deploys (Kubernetes cluster) |
-| Reconciliation | Continuous monitoring and correction |
+| Concept        | Purpose                                |
+| -------------- | -------------------------------------- |
+| Application    | Unit of deployment and management      |
+| Target State   | Desired state in Git (source of truth) |
+| Live State     | Actual running state in Kubernetes     |
+| Sync Status    | Whether target matches live            |
+| Sync           | Process of making target match live    |
+| Health         | Whether app is functioning correctly   |
+| Source         | Where manifests come from (Git)        |
+| Destination    | Where app deploys (Kubernetes cluster) |
+| Reconciliation | Continuous monitoring and correction   |
 
 Understanding these concepts is essential for effectively using Argo CD.
 

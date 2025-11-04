@@ -28,6 +28,7 @@ An XRD defines a custom infrastructure API. It specifies:
 - Whether claims are supported for multi-tenancy
 
 **Example**: A `Database` XRD might define that users can request a database by specifying:
+
 - `engine` (postgres, mysql, mariadb)
 - `version` (5.7, 8.0, etc.)
 - `size` (small, medium, large)
@@ -45,6 +46,7 @@ XRDs can be defined at two scopes:
 A Composite Resource is an instance of an XRD. When a user creates a composite resource, they're requesting infrastructure following the schema defined by the XRD.
 
 Key characteristics of composite resources:
+
 - **Declarative** - Stored in YAML, version controlled in Git
 - **Managed** - Created by users, managed/reconciled by the composition pipeline
 - **Stateful** - Track provisioning status, ready conditions, and resource details
@@ -52,6 +54,7 @@ Key characteristics of composite resources:
 - **Owned resources** - Own all the managed resources they create through compositions
 
 **Example**: Creating a `Database` composite resource:
+
 ```yaml
 apiVersion: database.example.com/v1
 kind: Database
@@ -69,6 +72,7 @@ spec:
 Claims are a multi-tenant abstraction of composite resources. They allow team members to request infrastructure without needing cluster-level visibility.
 
 Key characteristics:
+
 - **Namespaced** - Exist within a namespace, providing isolation
 - **Delegated** - An XRD automatically creates a claim resource type
 - **Reference** - Point to and reference the underlying composite resource
@@ -77,6 +81,7 @@ Key characteristics:
 When a user creates a claim, Crossplane automatically creates a corresponding composite resource. The claim becomes the user-facing interface to the infrastructure.
 
 **Relationships**:
+
 - One XRD can have one claim type
 - Multiple claims can reference the same composite resource (but typically 1:1)
 - Claims provide namespace-scoped access to infrastructure
@@ -86,6 +91,7 @@ When a user creates a claim, Crossplane automatically creates a corresponding co
 A Composition defines how a Composite Resource is realized into Managed Resources. It's the "recipe" for infrastructure.
 
 Key elements of a Composition:
+
 - **Selector** - Matches which composite resources this composition applies to
 - **Resources** - List of managed resources to create
 - **Patches** - Transform data from the composite resource to the managed resources
@@ -102,6 +108,7 @@ Modern Crossplane uses composition functions instead of simple templating:
 - **Functions support** Go, Python, template-based approaches
 
 **Example**: A database composition function might:
+
 - Take the requested `size` and map it to provider-specific instance types
 - Create a database instance with the specified configuration
 - Create a backup policy based on retention days
@@ -168,6 +175,7 @@ One of Crossplane's key strengths is supporting multi-cloud compositions:
 - User doesn't need to know about provider differences
 
 **Example**: A web application composition might:
+
 - Create a database on AWS RDS
 - Create a cache cluster on Azure (for cost/compliance reasons)
 - Create a DNS record on Google Cloud DNS
@@ -190,11 +198,11 @@ This allows operators to understand resource health at a glance and provides hoo
 
 The Crossplane system model provides a clean abstraction from complexity:
 
-| Layer | Component | Role |
-|-------|-----------|------|
-| User-facing | XRDs + Compositions | Define infrastructure APIs |
+| Layer                      | Component                          | Role                         |
+| -------------------------- | ---------------------------------- | ---------------------------- |
+| User-facing                | XRDs + Compositions                | Define infrastructure APIs   |
 | Infrastructure abstraction | Composite Resources (XRs) / Claims | Users request infrastructure |
-| Resource management | Managed Resources | Represent cloud resources |
-| Cloud providers | AWS, Azure, GCP, etc. | Actual infrastructure |
+| Resource management        | Managed Resources                  | Represent cloud resources    |
+| Cloud providers            | AWS, Azure, GCP, etc.              | Actual infrastructure        |
 
 This layered approach allows platform teams to build sophisticated, multi-cloud infrastructure platforms while keeping the user experience simple and consistent.

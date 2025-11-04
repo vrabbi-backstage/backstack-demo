@@ -11,6 +11,7 @@ Kyverno allows you to write policies as simple YAML resources with no new langua
 ## Key Philosophy
 
 **Kyverno believes that policies should be:**
+
 - **Simple** - Written in familiar YAML, not a new DSL
 - **Declarative** - Treat policies like code stored in Git
 - **Powerful** - Support complex validations and mutations
@@ -22,12 +23,14 @@ Kyverno allows you to write policies as simple YAML resources with no new langua
 ### Security and Compliance
 
 Without Kyverno, security teams struggle to:
+
 - ❌ Enforce consistent security standards across clusters
 - ❌ Prevent insecure container images from running
 - ❌ Validate resource configurations match organizational standards
 - ❌ Audit policy violations and track compliance
 
 With Kyverno:
+
 - ✅ Declaratively define security policies as YAML
 - ✅ Automatically validate and block non-compliant resources
 - ✅ Verify container images and supply chain security
@@ -36,12 +39,14 @@ With Kyverno:
 ### Best Practices Enforcement
 
 Without Kyverno:
+
 - ❌ No consistent resource labeling across teams
 - ❌ Difficult to enforce naming conventions
 - ❌ Manual verification of resource configurations
 - ❌ Inconsistent configurations across environments
 
 With Kyverno:
+
 - ✅ Automatically add required labels to resources
 - ✅ Enforce naming patterns and conventions
 - ✅ Automatically inject or patch resources
@@ -50,12 +55,14 @@ With Kyverno:
 ### Operational Safety
 
 Without Kyverno:
+
 - ❌ Applications can run with excessive privileges
 - ❌ No control over resource requests and limits
 - ❌ Difficult to enforce resource quotas
 - ❌ Manual cleanup of resources
 
 With Kyverno:
+
 - ✅ Require resource requests and limits
 - ✅ Prevent privilege escalation
 - ✅ Automatically generate required resources
@@ -66,6 +73,7 @@ With Kyverno:
 Kyverno provides four main policy functions:
 
 ### Validate
+
 Ensure resources conform to standards. Policies can audit violations or enforce them immediately.
 
 ```yaml
@@ -93,6 +101,7 @@ spec:
 ```
 
 ### Mutate
+
 Automatically modify resources to add required configurations, labels, or defaults.
 
 ```yaml
@@ -115,6 +124,7 @@ spec:
 ```
 
 ### Generate
+
 Automatically create resources based on triggers. Common use case: generate network policies, role bindings, etc.
 
 ```yaml
@@ -141,6 +151,7 @@ spec:
 ```
 
 ### Verify Images
+
 Verify container images are signed and come from trusted registries.
 
 ```yaml
@@ -174,21 +185,25 @@ spec:
 Kyverno policies enforce through multiple mechanisms:
 
 ### Admission Controller
+
 - **When**: At resource creation/update time
 - **Effect**: Block or audit policy violations in real-time
 - **Best for**: Preventing non-compliant resources immediately
 
 ### Background Scanner
+
 - **When**: Continuously scanning existing resources
 - **Effect**: Detect violations in existing clusters
 - **Best for**: Compliance auditing and reporting
 
 ### CLI
+
 - **When**: Local development or CI/CD pipeline
 - **Effect**: Validate resources before submission
 - **Best for**: Testing and validation early
 
 ### Web Service
+
 - **When**: External policy evaluation
 - **Effect**: Evaluate policies outside cluster
 - **Best for**: Multi-cluster or non-Kubernetes workloads
@@ -198,25 +213,33 @@ Kyverno policies enforce through multiple mechanisms:
 Kyverno supports multiple policy types for different use cases:
 
 ### ClusterPolicy
+
 Cluster-scoped policies applying to all namespaces
+
 - Security standards
 - Platform requirements
 - Cluster-wide compliance
 
 ### Policy
+
 Namespace-scoped policies
+
 - Team-specific rules
 - Development environment customizations
 - Namespace isolation
 
 ### ValidatingPolicy (Alpha)
+
 CEL-based validation policies (Kubernetes native extension)
+
 - Complex validations
 - Advanced conditional logic
 - Integration with Kubernetes API
 
 ### MutatingPolicy (Alpha)
+
 CEL-based mutation policies (Kubernetes native extension)
+
 - Complex mutations
 - Advanced conditional logic
 - Integration with Kubernetes API
@@ -226,6 +249,7 @@ CEL-based mutation policies (Kubernetes native extension)
 Control how policy violations are handled:
 
 ### Enforce
+
 Block violating resources immediately. Violations are not created.
 
 ```yaml
@@ -234,6 +258,7 @@ spec:
 ```
 
 ### Audit
+
 Allow violating resources but record violations in policy reports.
 
 ```yaml
@@ -251,6 +276,7 @@ Kyverno automatically generates policy reports using the CNCF Policy Working Gro
 - **Metrics** - Prometheus metrics for monitoring policy behavior
 
 Reports show:
+
 - ✅ Pass/fail results for each resource
 - 📊 Policy execution metrics
 - 🏷️ Resource categorization and severity
@@ -282,21 +308,25 @@ spec:
 ## Use Cases
 
 ### Platform Teams
+
 - Enforce infrastructure standards across the organization
 - Ensure consistent resource naming and tagging
 - Prevent security vulnerabilities at admission
 
 ### DevOps/SRE
+
 - Automate compliance scanning
 - Generate required resources automatically
 - Monitor policy violations in production
 
 ### Security Teams
+
 - Enforce image validation and supply chain security
 - Prevent privilege escalation
 - Audit resource configurations
 
 ### Development Teams
+
 - Validate resources locally before submission
 - Understand organizational requirements
 - Get early feedback on resource configurations

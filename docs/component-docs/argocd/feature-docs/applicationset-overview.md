@@ -39,6 +39,7 @@ spec:
 ```
 
 This leads to:
+
 - ❌ Massive amounts of duplication
 - ❌ Hard to update all applications together
 - ❌ Error-prone template management
@@ -57,7 +58,7 @@ spec:
     - git:
         repoURL: https://github.com/company/apps.git
         directories:
-          - path: 'apps/*'
+          - path: "apps/*"
   template:
     metadata:
       name: "{{ path.basename }}"
@@ -70,6 +71,7 @@ spec:
 ```
 
 Benefits:
+
 - ✅ Single definition for many applications
 - ✅ Easy to add/remove applications
 - ✅ Consistent configuration across all apps
@@ -108,7 +110,7 @@ spec:
             environment: staging
           - name: app3
             environment: prod
-  
+
   template:
     metadata:
       name: "{{ name }}"
@@ -133,9 +135,9 @@ generators:
       repoURL: https://github.com/company/apps.git
       revision: main
       directories:
-        - path: 'apps/*'
-        - path: 'services/*'
-        - path: 'databases/*'
+        - path: "apps/*"
+        - path: "services/*"
+        - path: "databases/*"
 ```
 
 #### Files
@@ -147,7 +149,7 @@ generators:
   - git:
       repoURL: https://github.com/company/config.git
       files:
-        - path: 'apps/*.json'
+        - path: "apps/*.json"
 ```
 
 ### 3. Cluster Generator
@@ -165,11 +167,12 @@ generators:
 template:
   spec:
     destination:
-      name: "{{ name }}"    # Cluster name
+      name: "{{ name }}" # Cluster name
       namespace: myapp
 ```
 
 Use when:
+
 - Deploying same application to multiple clusters
 - Multi-region/multi-cloud deployments
 - Different cluster configurations needed
@@ -184,7 +187,7 @@ generators:
       github:
         organization: mycompany
         allBranches: false
-        api: https://api.github.com  # For GitHub Enterprise
+        api: https://api.github.com # For GitHub Enterprise
 
 template:
   metadata:
@@ -196,6 +199,7 @@ template:
 ```
 
 Use when:
+
 - Deploying all repositories in organization
 - CI/CD triggered deployments
 - Dynamic repository discovery
@@ -212,8 +216,8 @@ generators:
         - git:
             repoURL: https://github.com/company/apps.git
             directories:
-              - path: 'apps/*'
-        
+              - path: "apps/*"
+
         # Second dimension: clusters
         - clusters:
             selector:
@@ -269,7 +273,7 @@ spec:
         selector:
           matchLabels:
             deploy-app: "true"
-  
+
   template:
     metadata:
       name: "{{ name }}-myapp"
@@ -302,8 +306,8 @@ spec:
     - git:
         repoURL: https://github.com/company/tenants.git
         directories:
-          - path: 'tenants/*'
-  
+          - path: "tenants/*"
+
   template:
     metadata:
       name: "{{ path.basename }}"
@@ -344,7 +348,7 @@ spec:
           - name: prod
             cluster: prod-cluster
             branch: main
-  
+
   template:
     metadata:
       name: "my-app-{{ name }}"
@@ -360,7 +364,7 @@ spec:
       syncPolicy:
         automated:
           prune: true
-          selfHeal: "{{ name != 'prod' }}"  # Auto-sync except prod
+          selfHeal: "{{ name != 'prod' }}" # Auto-sync except prod
 ```
 
 ### Progressive Deployment
@@ -380,7 +384,7 @@ spec:
             percentage: "10"
           - canary: "false"
             percentage: "100"
-  
+
   template:
     metadata:
       name: "my-app-{{ canary }}"

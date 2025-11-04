@@ -54,12 +54,14 @@ Kyverno operates through several integrated components working together to enfor
 The webhook server is the entry point for resource requests from the Kubernetes API server.
 
 **Responsibilities**:
+
 - Receives AdmissionReview requests from Kubernetes
 - Handles mutating and validating webhooks
 - Dynamically registers/updates webhooks based on deployed policies
 - Routes requests to the policy engine
 
 **Key features**:
+
 - Certificate management for TLS
 - Request/response handling
 - Webhook configuration updates
@@ -69,6 +71,7 @@ The webhook server is the entry point for resource requests from the Kubernetes 
 The core engine that evaluates policies against resources.
 
 **Responsibilities**:
+
 - Load and parse Kyverno policies
 - Match resources against policy rules
 - Evaluate policy conditions
@@ -76,6 +79,7 @@ The core engine that evaluates policies against resources.
 - Apply mutations if configured
 
 **Key operations**:
+
 - **Match evaluation** - Determine if resource matches policy scope
 - **Condition evaluation** - Check preconditions and deny rules
 - **Rule execution** - Execute validate, mutate, generate, or verify rules
@@ -86,6 +90,7 @@ The core engine that evaluates policies against resources.
 Handles async policy operations on existing resources.
 
 **Responsibilities**:
+
 - Discover existing resources in the cluster
 - Evaluate policies against existing resources
 - Apply mutations to existing resources (if configured)
@@ -93,6 +98,7 @@ Handles async policy operations on existing resources.
 - Create policy reports
 
 **Use cases**:
+
 - Scan existing resources against newly deployed policies
 - Mutate existing resources if policy changes
 - Generate resources for existing triggers
@@ -103,11 +109,13 @@ Handles async policy operations on existing resources.
 Manage creation and updates of policy reports.
 
 **Types of reports**:
+
 - **Admission Reports** - Results from admission requests
 - **Background Scan Reports** - Results from background scanning
 - **Policy Reports** - Aggregated reports per resource
 
 **Responsibilities**:
+
 - Aggregate policy evaluation results
 - Create PolicyReport and ClusterPolicyReport resources
 - Update reports as policies change
@@ -118,6 +126,7 @@ Manage creation and updates of policy reports.
 Manages TLS certificates for the webhook server.
 
 **Responsibilities**:
+
 - Generate and renew webhook certificates
 - Store certificates as Kubernetes Secrets
 - Ensure certificate validity
@@ -170,6 +179,7 @@ Output: Pass/Fail
 ```
 
 Features:
+
 - Pattern matching with wildcards
 - Conditional logic (if-then-else)
 - Deny rules for negative validation
@@ -188,6 +198,7 @@ Output: Modified resource
 ```
 
 Features:
+
 - Strategic merge patches
 - JSON patches (RFC 6902)
 - Overlay-style mutations
@@ -206,6 +217,7 @@ Output: New resource created
 ```
 
 Features:
+
 - Template-based generation
 - Namespace/cluster scoped
 - Automatic cleanup
@@ -224,6 +236,7 @@ Output: Pass/Fail based on verification
 ```
 
 Features:
+
 - Image signature verification
 - Attestation checking
 - Registry validation
@@ -234,16 +247,19 @@ Features:
 Control how policy violations are handled:
 
 ### Enforce
+
 - **Effect**: Block resource immediately
 - **Use case**: Security policies
 - **Report**: No entry (resource blocked)
 
 ### Audit
+
 - **Effect**: Allow resource, report violation
 - **Use case**: Compliance monitoring
 - **Report**: Entry in PolicyReport
 
 ### Skip
+
 - **Effect**: Allow and ignore policy
 - **Use case**: Testing/temporary
 - **Report**: Skipped entry in PolicyReport
@@ -271,6 +287,7 @@ exclude:
 ```
 
 Matching options:
+
 - **kinds** - Resource types
 - **name** - Resource name (wildcards supported)
 - **namespaces** - Namespace names
@@ -281,6 +298,7 @@ Matching options:
 ## Conditions and Context
 
 ### Preconditions
+
 Evaluated before rule execution:
 
 ```yaml
@@ -292,6 +310,7 @@ preconditions:
 ```
 
 ### Deny Rules
+
 Negative validation:
 
 ```yaml
@@ -304,6 +323,7 @@ deny:
 ```
 
 ### Context
+
 External data for policy evaluation:
 
 ```yaml
@@ -338,8 +358,9 @@ Kyverno supports HA deployments:
 - **Leader election** - Coordination between replicas
 
 Configuration for HA:
+
 ```yaml
-replicas: 3  # Multiple webhook instances
+replicas: 3 # Multiple webhook instances
 resources:
   requests:
     cpu: "100m"
@@ -349,16 +370,19 @@ resources:
 ## Performance Optimization
 
 ### Caching
+
 - Policy rules cached to avoid re-evaluation
 - Results cached when applicable
 - Configurable cache TTL
 
 ### Webhook Optimization
+
 - Only register webhooks for relevant resources
 - Early filtering based on match criteria
 - Parallel evaluation where possible
 
 ### Background Scanning
+
 - Configurable scan intervals
 - Selective namespace scanning
 - Priority-based scanning
@@ -366,16 +390,19 @@ resources:
 ## State Management
 
 ### Policy Storage
+
 - Policies stored as Kubernetes CRDs
 - Versioned in etcd
 - RBAC controlled access
 
 ### Report Storage
+
 - PolicyReports stored in namespaces
 - ClusterPolicyReports cluster-scoped
 - Automatic cleanup of old reports
 
 ### Webhook Configuration
+
 - ValidatingWebhookConfiguration
 - MutatingWebhookConfiguration
 - Dynamically updated based on policies
@@ -383,16 +410,19 @@ resources:
 ## Security Characteristics
 
 ### Authentication & Authorization
+
 - Leverages Kubernetes RBAC
 - Webhook authentication via service account
 - API access controlled by RBAC
 
 ### Network Security
+
 - TLS for all webhook communication
 - Service-to-service authentication
 - Network policies can restrict traffic
 
 ### Policy Auditing
+
 - All policy changes logged to etcd
 - Kubernetes audit log records all actions
 - Policy reports provide compliance audit trail
@@ -400,16 +430,19 @@ resources:
 ## Integration Points
 
 ### Kubernetes API
+
 - Webhook admission control
 - Event generation
 - Resource status updates
 
 ### Observability
+
 - **Prometheus metrics** - Policy execution times, pass/fail counts
 - **Structured logging** - JSON logs for aggregation
 - **Kubernetes events** - Real-time notification
 
 ### External Systems
+
 - Webhooks for external notifications
 - Policy reports accessible via API
 - CLI integration for testing
@@ -417,16 +450,19 @@ resources:
 ## Scalability Characteristics
 
 ### Cluster Size
+
 - Tested on large clusters (1000+ nodes)
 - Performance scales with cluster size
 - Background scanning configurable
 
 ### Policy Count
+
 - Hundreds of policies supported
 - Performance depends on policy complexity
 - Webhook optimization for large policy sets
 
 ### Request Rate
+
 - Handles high admission request rates
 - Parallel policy evaluation
 - Webhook timeouts configurable (1-30 seconds)

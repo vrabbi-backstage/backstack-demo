@@ -21,6 +21,7 @@ Policy Reports are Kubernetes custom resources that document policy violations a
 ### Types of Reports
 
 #### PolicyReport (Namespaced)
+
 A namespaced report documenting violations for resources in that namespace:
 
 ```yaml
@@ -30,18 +31,18 @@ metadata:
   name: polr-default
   namespace: default
 results:
-- policy: require-resource-limits
-  rule: validate-limits
-  result: fail
-  scored: true
-  resources:
-  - apiVersion: v1
-    kind: Pod
-    name: nginx-deploy-abc123
-    namespace: default
-  message: "CPU and memory limits required"
-  timestamp:
-    seconds: 1699564800
+  - policy: require-resource-limits
+    rule: validate-limits
+    result: fail
+    scored: true
+    resources:
+      - apiVersion: v1
+        kind: Pod
+        name: nginx-deploy-abc123
+        namespace: default
+    message: "CPU and memory limits required"
+    timestamp:
+      seconds: 1699564800
 summary:
   pass: 5
   fail: 2
@@ -51,6 +52,7 @@ summary:
 ```
 
 #### ClusterPolicyReport (Cluster-Scoped)
+
 A cluster-wide report documenting violations for cluster-scoped resources:
 
 ```yaml
@@ -59,16 +61,16 @@ kind: ClusterPolicyReport
 metadata:
   name: clusterpolicyreport
 results:
-- policy: require-pod-security
-  rule: check-privileged
-  result: fail
-  scored: true
-  resources:
-  - apiVersion: v1
-    kind: Pod
-    name: privileged-pod
-    namespace: kube-system
-  message: "Privileged containers not allowed"
+  - policy: require-pod-security
+    rule: check-privileged
+    result: fail
+    scored: true
+    resources:
+      - apiVersion: v1
+        kind: Pod
+        name: privileged-pod
+        namespace: kube-system
+    message: "Privileged containers not allowed"
 summary:
   pass: 152
   fail: 8
@@ -79,49 +81,59 @@ summary:
 
 ### Report Fields
 
-| Field | Description |
-|-------|-------------|
-| **policy** | Name of the policy that generated the result |
-| **rule** | Name of the rule within the policy |
-| **result** | Outcome: pass, fail, warn, error, skip |
-| **scored** | Whether violation counts toward compliance score |
-| **resources** | Affected Kubernetes resources |
-| **message** | Detailed violation message |
-| **timestamp** | When the violation was detected |
-| **properties** | Custom metadata about the violation |
+| Field          | Description                                      |
+| -------------- | ------------------------------------------------ |
+| **policy**     | Name of the policy that generated the result     |
+| **rule**       | Name of the rule within the policy               |
+| **result**     | Outcome: pass, fail, warn, error, skip           |
+| **scored**     | Whether violation counts toward compliance score |
+| **resources**  | Affected Kubernetes resources                    |
+| **message**    | Detailed violation message                       |
+| **timestamp**  | When the violation was detected                  |
+| **properties** | Custom metadata about the violation              |
 
 ### Report Results
 
 #### Pass
+
 Resource complies with policy rule:
+
 ```yaml
 result: pass
 message: "Pod has resource limits defined"
 ```
 
 #### Fail
+
 Resource violates policy rule (blocking):
+
 ```yaml
 result: fail
 message: "CPU limits required but not defined"
 ```
 
 #### Warn
+
 Resource violates advisory policy:
+
 ```yaml
 result: warn
 message: "Recommended to define resource requests"
 ```
 
 #### Error
+
 Policy evaluation error:
+
 ```yaml
 result: error
 message: "Unable to evaluate pattern: invalid CEL expression"
 ```
 
 #### Skip
+
 Policy skipped due to conditions:
+
 ```yaml
 result: skip
 message: "Policy excluded for system namespace"
@@ -140,8 +152,9 @@ Compliance Score = (Pass + (Warn × 0.5)) / Total Scored Results × 100
 ```
 
 Example calculation:
+
 - Pass: 95 results
-- Fail: 5 results  
+- Fail: 5 results
 - Warn: 5 results
 - Score: (95 + 2.5) / 105 × 100 = 92.6%
 
@@ -151,7 +164,7 @@ Track compliance by namespace:
 
 ```yaml
 # Get compliance summary for all namespaces
-kubectl get policyreport -A -o json | jq '.items[] | 
+kubectl get policyreport -A -o json | jq '.items[] |
   {
     namespace: .metadata.namespace,
     pass: .summary.pass,
@@ -180,7 +193,7 @@ Track which policies have highest violation rates:
 
 ```bash
 # Identify most-violated policies
-kubectl get policyreport -A -o json | jq -r '.items[].results[] | 
+kubectl get policyreport -A -o json | jq -r '.items[].results[] |
   select(.result == "fail") | .policy' | sort | uniq -c | sort -rn
 ```
 
@@ -198,20 +211,20 @@ kind: ClusterPolicy
 metadata:
   name: audit-pod-security
 spec:
-  validationFailureAction: audit  # Non-blocking
+  validationFailureAction: audit # Non-blocking
   rules:
-  - name: check-privileges
-    match:
-      resources:
-        kinds:
-        - Pod
-    validate:
-      message: "Privileged containers not recommended"
-      pattern:
-        spec:
-          containers:
-          - securityContext:
-              privileged: false
+    - name: check-privileges
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        message: "Privileged containers not recommended"
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  privileged: false
 ```
 
 When `audit` mode is set, violations are recorded but not blocked. Reports show violations that would be blocked in `enforce` mode.
@@ -222,27 +235,27 @@ Audit reports in PolicyReport show failures that didn't block admission:
 
 ```yaml
 results:
-- policy: pod-security-audit
-  rule: check-host-network
-  result: fail
-  scored: false
-  resources:
-  - apiVersion: v1
-    kind: Pod
-    name: network-pod
-    namespace: production
-  message: "Host network not allowed (audit mode)"
+  - policy: pod-security-audit
+    rule: check-host-network
+    result: fail
+    scored: false
+    resources:
+      - apiVersion: v1
+        kind: Pod
+        name: network-pod
+        namespace: production
+    message: "Host network not allowed (audit mode)"
 ```
 
 ### Querying Audit Reports
 
 ```bash
 # Find all failed audits
-kubectl get policyreport -A -o json | jq '.items[].results[] | 
+kubectl get policyreport -A -o json | jq '.items[].results[] |
   select(.result == "fail")'
 
 # Audit failures by policy
-kubectl get policyreport -A -o json | jq '.items[].results[] | 
+kubectl get policyreport -A -o json | jq '.items[].results[] |
   select(.result == "fail") | {policy, rule, resource: .resources[0].name}'
 ```
 
@@ -259,25 +272,25 @@ Configure how frequently Kyverno scans existing resources:
 kyverno:
   config:
     webhooks:
-    - admissionReviewVersions:
-      - v1
-      clientConfig:
-        url: https://kyverno-svc.kyverno:443/validate
-      failurePolicy: fail
-      name: validate.kyverno.io
-      rules:
-      - apiGroups:
-        - '*'
-        apiVersions:
-        - '*'
-        operations:
-        - CREATE
-        - UPDATE
-        resources:
-        - '*'
+      - admissionReviewVersions:
+          - v1
+        clientConfig:
+          url: https://kyverno-svc.kyverno:443/validate
+        failurePolicy: fail
+        name: validate.kyverno.io
+        rules:
+          - apiGroups:
+              - "*"
+            apiVersions:
+              - "*"
+            operations:
+              - CREATE
+              - UPDATE
+            resources:
+              - "*"
     background:
       maxQueuedEvents: 1000
-      scanInterval: 1h  # Rescan existing resources hourly
+      scanInterval: 1h # Rescan existing resources hourly
 ```
 
 ### Report Retention
@@ -334,7 +347,7 @@ Export violations to compliance tracking system:
 kubectl get policyreport -A -o json > compliance-report.json
 
 # Export violations only
-kubectl get policyreport -A -o json | jq '.items[].results[] | 
+kubectl get policyreport -A -o json | jq '.items[].results[] |
   select(.result == "fail")' > violations.json
 
 # Export to CSV
@@ -368,7 +381,7 @@ kubectl get clusterpolicyreport -o json | \
   jq '.items[0].summary' > compliance-$TIMESTAMP.json
 
 # Calculate trend (requires multiple snapshots)
-jq -s 'map(.fail) | . as $fails | 
+jq -s 'map(.fail) | . as $fails |
   ($fails | length) as $days |
   {
     current_fails: $fails[-1],
@@ -397,11 +410,12 @@ spec:
     matchLabels:
       app.kubernetes.io/name: kyverno
   endpoints:
-  - port: metrics
-    interval: 30s
+    - port: metrics
+      interval: 30s
 ```
 
 Key metrics:
+
 - `kyverno_policy_execution_duration_seconds`: Policy evaluation time
 - `kyverno_policy_results_total`: Total policy results
 - `kyverno_policy_results_fail`: Failed validation count
@@ -451,6 +465,7 @@ done
 ## Best Practices
 
 ### 1. Enable Background Scans
+
 Ensure background scan is enabled to detect violations in existing resources:
 
 ```bash
@@ -459,6 +474,7 @@ kubectl get configmap kyverno -n kyverno -o yaml | grep -i background
 ```
 
 ### 2. Use Audit Mode for Validation
+
 Test policies in audit mode before enforcement:
 
 ```yaml
@@ -467,6 +483,7 @@ spec:
 ```
 
 ### 3. Monitor Report Growth
+
 Keep track of report sizes to prevent bloat:
 
 ```bash
@@ -475,6 +492,7 @@ kubectl get policyreport -A -o json | jq '.items | length'
 ```
 
 ### 4. Export Reports Regularly
+
 Create automated backups:
 
 ```bash
@@ -483,6 +501,7 @@ Create automated backups:
 ```
 
 ### 5. Create Compliance Baselines
+
 Establish baseline compliance metrics:
 
 ```bash
@@ -491,6 +510,7 @@ kubectl get clusterpolicyreport -o json | jq '.items[0].summary' > baseline.json
 ```
 
 ### 6. Dashboard with Kubernetes Dashboard
+
 Create a custom Kubernetes dashboard view:
 
 ```bash
@@ -508,11 +528,13 @@ helm install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard
 **Problem**: PolicyReports are empty
 
 **Causes**:
+
 - Policies in audit mode but not in enforce
 - Background scan disabled
 - Policies don't match resources
 
 **Solution**:
+
 ```bash
 # Check policy status
 kubectl describe clusterpolicy my-policy
@@ -531,11 +553,13 @@ kubectl patch configmap kyverno -n kyverno --type merge -p \
 **Problem**: Reports show stale data
 
 **Causes**:
+
 - Background scan interval too long
 - Reports TTL expired
 - Kyverno unable to reconcile
 
 **Solution**:
+
 ```bash
 # Trigger immediate scan
 kubectl delete policyreport --all -A
@@ -550,6 +574,7 @@ kubectl rollout restart deployment kyverno-background-controller -n kyverno
 **Problem**: Reports consuming excessive storage
 
 **Solution**:
+
 ```bash
 # Implement TTL for old reports
 kubectl patch configmap kyverno -n kyverno --type merge -p \

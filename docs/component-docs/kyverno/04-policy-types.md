@@ -26,7 +26,7 @@ A `ClusterPolicy` is a cluster-scoped Kyverno resource that defines rules applic
 - **Resource Kind**: `ClusterPolicy`
 - **API Group**: `kyverno.io`
 - **Admission Phase**: Can operate as webhook (admission controller) or background
-- **Common Uses**: 
+- **Common Uses**:
   - Organization-wide security standards
   - Network policy enforcement
   - Resource naming conventions
@@ -36,6 +36,7 @@ A `ClusterPolicy` is a cluster-scoped Kyverno resource that defines rules applic
 ### Key Features
 
 #### Validation Rules
+
 ```yaml
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -44,23 +45,24 @@ metadata:
 spec:
   validationFailureAction: audit
   rules:
-  - name: validate-limits
-    match:
-      resources:
-        kinds:
-        - Pod
-    validate:
-      message: "CPU and memory limits required"
-      pattern:
-        spec:
-          containers:
-          - resources:
-              limits:
-                memory: "?*"
-                cpu: "?*"
+    - name: validate-limits
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        message: "CPU and memory limits required"
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  limits:
+                    memory: "?*"
+                    cpu: "?*"
 ```
 
 #### Mutation Rules
+
 ```yaml
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -68,19 +70,20 @@ metadata:
   name: add-default-labels
 spec:
   rules:
-  - name: add-labels
-    match:
-      resources:
-        kinds:
-        - Pod
-    mutate:
-      patchStrategicMerge:
-        metadata:
-          labels:
-            app.kubernetes.io/managed-by: kyverno
+    - name: add-labels
+      match:
+        resources:
+          kinds:
+            - Pod
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            labels:
+              app.kubernetes.io/managed-by: kyverno
 ```
 
 #### Generation Rules
+
 ```yaml
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -88,27 +91,27 @@ metadata:
   name: generate-network-policy
 spec:
   rules:
-  - name: create-network-policy
-    match:
-      resources:
-        kinds:
-        - Namespace
-        selector:
-          matchLabels:
-            enforce-netpol: "true"
-    generate:
-      kind: NetworkPolicy
-      name: default-deny
-      namespace: "{{request.object.metadata.name}}"
-      data:
-        apiVersion: networking.k8s.io/v1
+    - name: create-network-policy
+      match:
+        resources:
+          kinds:
+            - Namespace
+          selector:
+            matchLabels:
+              enforce-netpol: "true"
+      generate:
         kind: NetworkPolicy
-        metadata:
-          name: default-deny
-        spec:
-          podSelector: {}
-          policyTypes:
-          - Ingress
+        name: default-deny
+        namespace: "{{request.object.metadata.name}}"
+        data:
+          apiVersion: networking.k8s.io/v1
+          kind: NetworkPolicy
+          metadata:
+            name: default-deny
+          spec:
+            podSelector: {}
+            policyTypes:
+              - Ingress
 ```
 
 ### When to Use ClusterPolicy
@@ -148,6 +151,7 @@ A `Policy` is a namespace-scoped Kyverno resource defining rules specific to a s
 ### Key Features
 
 #### Namespace-Scoped Validation
+
 ```yaml
 apiVersion: kyverno.io/v1
 kind: Policy
@@ -157,21 +161,22 @@ metadata:
 spec:
   validationFailureAction: enforce
   rules:
-  - name: require-security-context
-    match:
-      resources:
-        kinds:
-        - Pod
-    validate:
-      message: "Security context required"
-      pattern:
-        spec:
-          containers:
-          - securityContext:
-              runAsNonRoot: true
+    - name: require-security-context
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        message: "Security context required"
+        pattern:
+          spec:
+            containers:
+              - securityContext:
+                  runAsNonRoot: true
 ```
 
 #### Team-Level Mutation
+
 ```yaml
 apiVersion: kyverno.io/v1
 kind: Policy
@@ -180,19 +185,19 @@ metadata:
   namespace: team-a
 spec:
   rules:
-  - name: inject-team-labels
-    match:
-      resources:
-        kinds:
-        - Pod
-        - Service
-        - Deployment
-    mutate:
-      patchStrategicMerge:
-        metadata:
-          labels:
-            team: team-a
-            cost-center: "1234"
+    - name: inject-team-labels
+      match:
+        resources:
+          kinds:
+            - Pod
+            - Service
+            - Deployment
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            labels:
+              team: team-a
+              cost-center: "1234"
 ```
 
 ### When to Use Policy
@@ -234,6 +239,7 @@ A `ValidatingPolicy` is a newer Kyverno resource type (v1alpha2) specifically op
 ### Key Features
 
 #### CEL-Based Validation
+
 ```yaml
 apiVersion: kyverno.io/v1alpha2
 kind: ValidatingPolicy
@@ -242,21 +248,22 @@ metadata:
 spec:
   validationFailureAction: enforce
   rules:
-  - name: require-approved-registry
-    match:
-      resources:
-        kinds:
-        - Pod
-    validate:
-      cel:
-        expressions:
-        - expression: |
-            object.spec.containers.all(container,
-            container.image.startsWith('registry.company.com/'))
-          message: "Image must be from approved registry"
+    - name: require-approved-registry
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        cel:
+          expressions:
+            - expression: |
+                object.spec.containers.all(container,
+                container.image.startsWith('registry.company.com/'))
+              message: "Image must be from approved registry"
 ```
 
 #### Pattern-Based Validation
+
 ```yaml
 apiVersion: kyverno.io/v1alpha2
 kind: ValidatingPolicy
@@ -265,19 +272,19 @@ metadata:
 spec:
   validationFailureAction: audit
   rules:
-  - name: check-requests
-    match:
-      resources:
-        kinds:
-        - Pod
-    validate:
-      pattern:
-        spec:
-          containers:
-          - resources:
-              requests:
-                cpu: "?*"
-                memory: "?*"
+    - name: check-requests
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  requests:
+                    cpu: "?*"
+                    memory: "?*"
 ```
 
 ### When to Use ValidatingPolicy
@@ -319,6 +326,7 @@ A `MutatingPolicy` is a Kyverno resource type specifically optimized for mutatio
 ### Key Features
 
 #### Strategic Merge Patch Mutation
+
 ```yaml
 apiVersion: kyverno.io/v1alpha2
 kind: MutatingPolicy
@@ -326,29 +334,30 @@ metadata:
   name: inject-sidecar
 spec:
   rules:
-  - name: inject-logging-sidecar
-    match:
-      resources:
-        kinds:
-        - Pod
-        selector:
-          matchLabels:
-            logging-enabled: "true"
-    mutate:
-      patchStrategicMerge:
-        spec:
-          containers:
-          - name: logging-agent
-            image: logging-agent:latest
-            volumeMounts:
-            - name: logs
-              mountPath: /var/log
-          volumes:
-          - name: logs
-            emptyDir: {}
+    - name: inject-logging-sidecar
+      match:
+        resources:
+          kinds:
+            - Pod
+          selector:
+            matchLabels:
+              logging-enabled: "true"
+      mutate:
+        patchStrategicMerge:
+          spec:
+            containers:
+              - name: logging-agent
+                image: logging-agent:latest
+                volumeMounts:
+                  - name: logs
+                    mountPath: /var/log
+            volumes:
+              - name: logs
+                emptyDir: {}
 ```
 
 #### JSON Patch Mutation
+
 ```yaml
 apiVersion: kyverno.io/v1alpha2
 kind: MutatingPolicy
@@ -356,16 +365,16 @@ metadata:
   name: enforce-pod-priority
 spec:
   rules:
-  - name: set-priority-class
-    match:
-      resources:
-        kinds:
-        - Pod
-    mutate:
-      patchesJson6902: |
-        - op: add
-          path: /spec/priorityClassName
-          value: high-priority
+    - name: set-priority-class
+      match:
+        resources:
+          kinds:
+            - Pod
+      mutate:
+        patchesJson6902: |
+          - op: add
+            path: /spec/priorityClassName
+            value: high-priority
 ```
 
 ### When to Use MutatingPolicy
@@ -405,6 +414,7 @@ A `GeneratingPolicy` (used within ClusterPolicy or Policy with generation rules)
 ### Key Features
 
 #### Namespace-Triggered Generation
+
 ```yaml
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -412,51 +422,52 @@ metadata:
   name: create-namespace-defaults
 spec:
   rules:
-  - name: create-network-policy
-    match:
-      resources:
-        kinds:
-        - Namespace
-    generate:
-      kind: NetworkPolicy
-      name: default-deny-ingress
-      namespace: "{{request.object.metadata.name}}"
-      data:
-        apiVersion: networking.k8s.io/v1
+    - name: create-network-policy
+      match:
+        resources:
+          kinds:
+            - Namespace
+      generate:
         kind: NetworkPolicy
-        metadata:
-          name: default-deny-ingress
-        spec:
-          podSelector: {}
-          policyTypes:
-          - Ingress
+        name: default-deny-ingress
+        namespace: "{{request.object.metadata.name}}"
+        data:
+          apiVersion: networking.k8s.io/v1
+          kind: NetworkPolicy
+          metadata:
+            name: default-deny-ingress
+          spec:
+            podSelector: {}
+            policyTypes:
+              - Ingress
 
-  - name: create-resource-quota
-    match:
-      resources:
-        kinds:
-        - Namespace
-        selector:
-          matchLabels:
-            enforce-quota: "true"
-    generate:
-      kind: ResourceQuota
-      name: default-quota
-      namespace: "{{request.object.metadata.name}}"
-      data:
-        apiVersion: v1
+    - name: create-resource-quota
+      match:
+        resources:
+          kinds:
+            - Namespace
+          selector:
+            matchLabels:
+              enforce-quota: "true"
+      generate:
         kind: ResourceQuota
-        metadata:
-          name: default-quota
-        spec:
-          hard:
-            requests.cpu: "10"
-            requests.memory: "20Gi"
-            limits.cpu: "20"
-            limits.memory: "40Gi"
+        name: default-quota
+        namespace: "{{request.object.metadata.name}}"
+        data:
+          apiVersion: v1
+          kind: ResourceQuota
+          metadata:
+            name: default-quota
+          spec:
+            hard:
+              requests.cpu: "10"
+              requests.memory: "20Gi"
+              limits.cpu: "20"
+              limits.memory: "40Gi"
 ```
 
 #### RBAC Role Generation
+
 ```yaml
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -464,24 +475,24 @@ metadata:
   name: create-default-roles
 spec:
   rules:
-  - name: create-view-role
-    match:
-      resources:
-        kinds:
-        - Namespace
-    generate:
-      kind: Role
-      name: default-viewer
-      namespace: "{{request.object.metadata.name}}"
-      data:
-        apiVersion: rbac.authorization.k8s.io/v1
+    - name: create-view-role
+      match:
+        resources:
+          kinds:
+            - Namespace
+      generate:
         kind: Role
-        metadata:
-          name: default-viewer
-        rules:
-        - apiGroups: [""]
-          resources: ["pods", "services"]
-          verbs: ["get", "list"]
+        name: default-viewer
+        namespace: "{{request.object.metadata.name}}"
+        data:
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: Role
+          metadata:
+            name: default-viewer
+          rules:
+            - apiGroups: [""]
+              resources: ["pods", "services"]
+              verbs: ["get", "list"]
 ```
 
 ### When to Use Generating Policies
@@ -520,6 +531,7 @@ A `DeletingPolicy` (implemented via `kind: ClusterPolicy` with deletion configur
 ### Key Features
 
 #### Preventing Resource Deletion
+
 ```yaml
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -528,25 +540,26 @@ metadata:
 spec:
   validationFailureAction: enforce
   rules:
-  - name: prevent-pvc-delete
-    match:
-      resources:
-        kinds:
-        - PersistentVolumeClaim
-        selector:
-          matchLabels:
-            protected: "true"
-    validate:
-      message: "Protected PVCs cannot be deleted"
-      deny:
-        conditions:
-          all:
-          - key: "{{request.operation}}"
-            operator: Equals
-            value: DELETE
+    - name: prevent-pvc-delete
+      match:
+        resources:
+          kinds:
+            - PersistentVolumeClaim
+          selector:
+            matchLabels:
+              protected: "true"
+      validate:
+        message: "Protected PVCs cannot be deleted"
+        deny:
+          conditions:
+            all:
+              - key: "{{request.operation}}"
+                operator: Equals
+                value: DELETE
 ```
 
 #### Audit Deletion Attempts
+
 ```yaml
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -555,19 +568,19 @@ metadata:
 spec:
   validationFailureAction: audit
   rules:
-  - name: audit-secret-delete
-    match:
-      resources:
-        kinds:
-        - Secret
-    validate:
-      message: "Secret deletion attempt"
-      deny:
-        conditions:
-          all:
-          - key: "{{request.operation}}"
-            operator: Equals
-            value: DELETE
+    - name: audit-secret-delete
+      match:
+        resources:
+          kinds:
+            - Secret
+      validate:
+        message: "Secret deletion attempt"
+        deny:
+          conditions:
+            all:
+              - key: "{{request.operation}}"
+                operator: Equals
+                value: DELETE
 ```
 
 ### When to Use Deletion Controls
@@ -600,6 +613,7 @@ An `ImageValidatingPolicy` is a specialized policy type for container image vali
 ### Key Features
 
 #### Image Signature Verification
+
 ```yaml
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -608,24 +622,25 @@ metadata:
 spec:
   validationFailureAction: enforce
   rules:
-  - name: verify-signatures
-    match:
-      resources:
-        kinds:
-        - Pod
-    verifyImages:
-    - imageReferences:
-      - "gcr.io/mycompany/*"
-      attestors:
-      - name: verify-attestation
-        attestationProvider:
-          name: github-actions
-      - name: verify-signature
-        attestationProvider:
-          name: cosign-pub
+    - name: verify-signatures
+      match:
+        resources:
+          kinds:
+            - Pod
+      verifyImages:
+        - imageReferences:
+            - "gcr.io/mycompany/*"
+          attestors:
+            - name: verify-attestation
+              attestationProvider:
+                name: github-actions
+            - name: verify-signature
+              attestationProvider:
+                name: cosign-pub
 ```
 
 #### Registry Validation
+
 ```yaml
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -634,17 +649,17 @@ metadata:
 spec:
   validationFailureAction: enforce
   rules:
-  - name: approved-registries
-    match:
-      resources:
-        kinds:
-        - Pod
-    validate:
-      message: "Only approved registries allowed"
-      pattern:
-        spec:
-          containers:
-          - image: "gcr.io/mycompany/* | docker.io/library/*"
+    - name: approved-registries
+      match:
+        resources:
+          kinds:
+            - Pod
+      validate:
+        message: "Only approved registries allowed"
+        pattern:
+          spec:
+            containers:
+              - image: "gcr.io/mycompany/* | docker.io/library/*"
 ```
 
 ### When to Use Image Validation
@@ -659,44 +674,50 @@ spec:
 
 ## Policy Type Comparison Matrix
 
-| Feature | ClusterPolicy | Policy | ValidatingPolicy | MutatingPolicy | Generating | Image Validating |
-|---------|---------------|--------|------------------|----------------|-----------|------------------|
-| **Scope** | Cluster-wide | Namespace | Cluster-wide | Cluster-wide | Cluster/NS | Cluster-wide |
-| **Available Since** | v1.0 | v1.0 | v1.13 | v1.13 | v1.0 | v1.6 |
-| **Validation Rules** | Yes | Yes | Yes | No | N/A | Yes |
-| **Mutation Rules** | Yes | Yes | No | Yes | N/A | No |
-| **Generation Rules** | Yes | Yes | No | No | Yes | No |
-| **CEL Support** | Limited | Limited | Yes | Limited | No | Yes |
-| **Performance** | Standard | Standard | Optimized | Optimized | Standard | Optimized |
-| **Team Autonomy** | No | Yes | No | No | No | No |
-| **Admission Webhook** | Yes | Yes | Yes | Yes | No | Yes |
-| **Background Rules** | Yes | Yes | No | No | Yes | No |
+| Feature               | ClusterPolicy | Policy    | ValidatingPolicy | MutatingPolicy | Generating | Image Validating |
+| --------------------- | ------------- | --------- | ---------------- | -------------- | ---------- | ---------------- |
+| **Scope**             | Cluster-wide  | Namespace | Cluster-wide     | Cluster-wide   | Cluster/NS | Cluster-wide     |
+| **Available Since**   | v1.0          | v1.0      | v1.13            | v1.13          | v1.0       | v1.6             |
+| **Validation Rules**  | Yes           | Yes       | Yes              | No             | N/A        | Yes              |
+| **Mutation Rules**    | Yes           | Yes       | No               | Yes            | N/A        | No               |
+| **Generation Rules**  | Yes           | Yes       | No               | No             | Yes        | No               |
+| **CEL Support**       | Limited       | Limited   | Yes              | Limited        | No         | Yes              |
+| **Performance**       | Standard      | Standard  | Optimized        | Optimized      | Standard   | Optimized        |
+| **Team Autonomy**     | No            | Yes       | No               | No             | No         | No               |
+| **Admission Webhook** | Yes           | Yes       | Yes              | Yes            | No         | Yes              |
+| **Background Rules**  | Yes           | Yes       | No               | No             | Yes        | No               |
 
 ---
 
 ## Selection Guide: Choosing the Right Policy Type
 
 ### For Validation-Only Scenarios
+
 - **New deployments (v1.13+)**: Use `ValidatingPolicy`
 - **Existing deployments**: Use `ClusterPolicy` with validation rules only
 
 ### For Mutation-Only Scenarios
+
 - **New deployments (v1.13+)**: Use `MutatingPolicy`
 - **Existing deployments**: Use `ClusterPolicy` with mutation rules only
 
 ### For Generation Scenarios
+
 - **Cluster-wide generation**: Use `ClusterPolicy` with generation rules
 - **Namespace-scoped generation**: Use `Policy` with generation rules
 
 ### For Image Validation
+
 - **Always**: Use specialized image validation rules within policy type
 - **For signatures**: Use image verification fields
 
 ### For Namespace-Scoped Enforcement
+
 - **Team autonomy required**: Use `Policy`
 - **Cluster-wide enforcement**: Use `ClusterPolicy`
 
 ### For Compliance/Audit
+
 - **Organizational standards**: Use `ClusterPolicy`
 - **Team-specific standards**: Use `Policy`
 - **Image supply chain**: Use image validation rules
@@ -706,16 +727,20 @@ spec:
 ## Best Practices
 
 ### 1. Start with Audit Mode
+
 Begin with `validationFailureAction: audit` before switching to `enforce`:
+
 ```yaml
 spec:
-  validationFailureAction: audit  # Start here
+  validationFailureAction: audit # Start here
   # Later, move to:
   # validationFailureAction: enforce
 ```
 
 ### 2. Use Policy for Team Autonomy
+
 Empower teams with namespace-scoped `Policy` resources:
+
 ```yaml
 apiVersion: kyverno.io/v1
 kind: Policy
@@ -724,44 +749,52 @@ metadata:
 ```
 
 ### 3. Leverage ValidatingPolicy for Performance
+
 In high-throughput environments, separate validation from mutation:
+
 ```yaml
 apiVersion: kyverno.io/v1alpha2
-kind: ValidatingPolicy  # Optimized validation
+kind: ValidatingPolicy # Optimized validation
 ---
 apiVersion: kyverno.io/v1alpha2
-kind: MutatingPolicy    # Optimized mutation
+kind: MutatingPolicy # Optimized mutation
 ```
 
 ### 4. Exclude System Namespaces
+
 Prevent policies from affecting Kyverno itself:
+
 ```yaml
 spec:
   rules:
-  - name: my-rule
-    exclude:
-      resources:
-        namespaces:
-        - kyverno
-        - kube-system
-        - kube-node-lease
+    - name: my-rule
+      exclude:
+        resources:
+          namespaces:
+            - kyverno
+            - kube-system
+            - kube-node-lease
 ```
 
 ### 5. Use Generation for Defaults
+
 Automate creation of required resources:
+
 ```yaml
 - name: create-defaults
   match:
     resources:
       kinds:
-      - Namespace
+        - Namespace
   generate:
     kind: NetworkPolicy
     # Auto-creates NetworkPolicy for each new namespace
 ```
 
 ### 6. Combine Policy Types for Layered Security
+
 Use multiple policies for defense-in-depth:
+
 ```yaml
 # First: Validate compliance
 kind: ValidatingPolicy
