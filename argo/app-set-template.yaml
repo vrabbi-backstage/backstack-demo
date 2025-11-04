@@ -8,6 +8,7 @@ spec:
   goTemplateOptions: ["missingkey=error"]
   generators:
     - git:
+        requeueAfterSeconds: 60
         repoURL: https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}.git
         revision: main
         files:
