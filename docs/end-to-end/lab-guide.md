@@ -109,6 +109,11 @@ This plugin provides Backstage template actions for RegExp. this allows you to d
 This module provides an GitHub auth provider implementation for @backstage/plugin-auth-backend.
 
 [Plugin Docs](../component-docs/backstage/plugin-docs/github-auth/overview.md)
+
+### ArgoCD Plugins
+This mset of backend and frontend plugins gives visibility into the ArgoCD Application related to a component directly in the Backstage UI, including links to go to the application in the ArgoCD UI if needed for further capabilities.
+
+[Plugin Docs](../component-docs/backstage/plugin-docs/argocd/overview.md)
 </details>
   
 <details>
@@ -397,6 +402,21 @@ kyverno:
 
 Disables the Kyverno permission framework, allowing unrestricted access to policy reports.
 
+#### ArgoCD Plugin
+
+```yaml
+argocd:
+  username: admin
+  password: ${ARGOCD_ADMIN_PASSWORD}
+  appLocatorMethods:
+    - type: 'config'
+      instances:
+        - name: demo-instance
+          url: https://${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/argocd
+```
+
+Configures the ArgoCD instance we are connecting to that has the relevant applications connected to our components.
+
 #### Kubernetes Plugin
 
 ```yaml
@@ -465,6 +485,7 @@ spec:
   goTemplateOptions: ["missingkey=error"]
   generators:
     - git:
+        requeueAfterSeconds: 60
         repoURL: https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}.git
         revision: main
         files:
@@ -986,9 +1007,9 @@ kubectl get clusterpolicyreport -o yaml
 
 # Workshop Persona Scenarios
 <details>
-  <summary>Developer Exerience - End to End Flow</summary>
+  <summary>End to End Flow - Developer Exerience</summary>
 
-## End to end flow - User Perspective
+## End to end flow - Developer Exerience
 
 Let's go through what a day in the life of a developer looks like in the BACKStack ecosystem. This walkthrough demonstrates how developers interact with the platform to discover existing applications, create new ones, and remediate policy violations.
 
@@ -1254,6 +1275,29 @@ Within seconds (configured as 10-second polling), your new application appears i
 - Relationships to other resources
 - Integration with Kyverno and Crossplane plugins
 
+
+#### ArgoCD Visibility
+
+Now if we click on our new component in the catalog, we will see on the overview page a new widget from the ArgoCD plugin, as well as a new tab for the component page around ArgoCD Deployment Lifecycle.
+
+The widget gives us a high level view of the ArgoCD applications status, as well as a hyperlink to the ArgoCD UI directly to the component allowing for a simple UX for developers.
+  
+![Argo widget](../images/dev-flow/argo-widget.png)
+  
+The Tab gives us a more detailed view including links to the ArgoCD UI, as well as links to the specific git commit currently being targetted by this application.
+  
+![Argo Tab](../images/dev-flow/argo-tab.png)
+  
+If you want to login to the ArgoCD UI, you can use the user admin. The password can be retrieved running the bellow commands:
+
+```bash
+export ARGOCD_ADMIN_PASSWORD=`kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 --decode`
+
+echo "ArgoCD URL: https://${CODESPACE_NAME}-443.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}/argocd"
+echo "ArgoCD Username: admin"
+echo "ArgoCD Password: ${ARGOCD_ADMIN_PASSWORD}"
+```
+
 ### Step 7: Addressing Policy Violations
 
 When you view the newly created app in Backstage, you might see policy violations:
@@ -1353,7 +1397,7 @@ kubectl patch application backstack-demo-app-demo-app-01 -n argocd \
 
 ![Manually Sync App](../images/dev-flow/33-manually-sync-app-kubectl.png)
 
-This can also be done via the ArgoCD CLI or UI (The UI does not work in web based codespaces) which can be setup using the [following guide](../../ARGOCD.md)
+This can also be done via the ArgoCD CLI or UI.
 
 ### Step 10: Verifying Policy Compliance
 
@@ -2024,6 +2068,8 @@ This just leaves Backstage. Actually Backstage has a built-in MCP server which t
 Backstage has a new capability since Backstage 1.40, allowing us to turn Backstage into a remote MCP server, supporting both SSE (deprecated) and Streamable HTTP protocols. This capability also supports the MCP OAuth specification, supporting dynamic client registration. This allows us to expose backstage plugin capabilities as MCP tools in an aggregated MCP server provided by backstage, and for the same auth and RBAC which is configured in Backstage the portal to also be enforced in our MCP interface to Backstage!
 
 In this demo einvironment we have included a few plugins which implement the new MCP tool capabilities which we can test in this environment.
+
+The bellow instructions will require your GitHub user to have copilot enabled (the free tier is ok). If you prefer to use a different tool, Cursor can also work and you just need to add the details mentioned bellow into your MCP configuration in Cursor. The same is true for Claude code as well.
 
 ### View configuration
 In your environment you can navigate to the relevant MCP config file located [here](../../.vscode/mcp.json)
